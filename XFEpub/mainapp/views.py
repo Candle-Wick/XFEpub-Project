@@ -50,6 +50,23 @@ class web_scraper:
         last_page_number = int(last_page.find('a').text)
 
         #Step 2.1, update package document, manifest, spine
+        # Adding all tge files and folder boilerstuff
+        '''
+            mimetype
+            META-INT
+            > container.xml
+            EPUB
+            > content.opf
+            > introduction.xhtml
+            > nav.xhtml
+            > toc.ncx
+            style
+                > main.css
+                > nav.css
+        
+        '''
+
+
         return # TODO, Remove this
         for i in range(2, last_page_number+1):
             print(f"https://forums.sufficientvelocity.com/threads/warhammer-fantasy-divided-loyalties-an-advisors-quest.44838/reader/page-{i}")
@@ -57,6 +74,8 @@ class web_scraper:
             self.pack_articles(response)
             if i % 2 ==0:
                 time.sleep(0.6)
+
+        # finish boilerstuff
 
     def pack_articles(self, response):
         '''Takes a GET Request response, and converts the chapters inside that response into chapters of the files.'''
@@ -74,5 +93,5 @@ class web_scraper:
     
     def zip_up(self):
         #TODO
-        '''Takes the entire thing, and converts to '''
+        '''Takes the entire thing, and converts to epub file'''
         return
