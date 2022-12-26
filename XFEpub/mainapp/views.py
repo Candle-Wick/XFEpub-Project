@@ -18,7 +18,6 @@ def api_webscrape_call():
     #If url not valid, break.
 
     web_scraper.start_boilerplate()
-    return
 
     base_url = 'https://forums.sufficientvelocity.com/threads/warhammer-fantasy-divided-loyalties-an-advisors-quest.44838/reader/'
 
@@ -45,6 +44,7 @@ class web_scraper:
         # Fetch from user
         
         response = requests.get(base_url, headers)
+        self.start_boilerplate(response)
         self.pack_articles(response)
         soup = bs4.BeautifulSoup(response.content, 'html.parser')
 
@@ -101,10 +101,11 @@ class web_scraper:
         return
 
 
-    def start_boilerplate():
+    def start_boilerplate(self, response):
         '''Create content.opf, introduction.xhtml, nav and toc'''
-
+        soup = bs4.BeautifulSoup(response.content, 'html.parser')
+        introduction_block = soup.find('div', class_='threadmarkListingHeader')
 
         with open('ToZip/EPUB/introduction.xhtml', 'w') as f:
             f.write('<?xml version=\'1.0\' encoding="utf-8"?>\n<!DOCTYPE html>\n<html xmlns="http://www.w3.org/1999/xhtml" xmlns:epub="http://www.idpf.org/2007/ops" epub:prefix="z3998: http://www.daisy.org/z3998/2012/vocab/structure/#" lang="en" xml:lang="en">')
-            f.write(f'<head>\n<title>{" TEST TITLE "}</title>\n</head><body>')
+            f.write(f'<head>\n<title>{str( introduction_block.find("h1")) }</title>\n</head><body>')
