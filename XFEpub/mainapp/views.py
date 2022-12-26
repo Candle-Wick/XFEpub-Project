@@ -1,5 +1,5 @@
 from django.shortcuts import render
-import requests, bs4, validators, time
+import requests, bs4, validators, time, re
 from pathlib import Path
 
 
@@ -16,6 +16,9 @@ def api_webscrape_call():
     #If url doesnt match regex .*\/reader\/$
     # Add reader/
     #If url not valid, break.
+
+    web_scraper.start_boilerplate()
+    return
 
     base_url = 'https://forums.sufficientvelocity.com/threads/warhammer-fantasy-divided-loyalties-an-advisors-quest.44838/reader/'
 
@@ -68,6 +71,7 @@ class web_scraper:
 
 
         return # TODO, Remove this
+        
         for i in range(2, last_page_number+1):
             print(f"https://forums.sufficientvelocity.com/threads/warhammer-fantasy-divided-loyalties-an-advisors-quest.44838/reader/page-{i}")
             response = requests.get(f'{base_url}page-{i}', headers)
@@ -95,3 +99,12 @@ class web_scraper:
         #TODO
         '''Takes the entire thing, and converts to epub file'''
         return
+
+
+    def start_boilerplate():
+        '''Create content.opf, introduction.xhtml, nav and toc'''
+
+
+        with open('ToZip/EPUB/introduction.xhtml', 'w') as f:
+            f.write('<?xml version=\'1.0\' encoding="utf-8"?>\n<!DOCTYPE html>\n<html xmlns="http://www.w3.org/1999/xhtml" xmlns:epub="http://www.idpf.org/2007/ops" epub:prefix="z3998: http://www.daisy.org/z3998/2012/vocab/structure/#" lang="en" xml:lang="en">')
+            f.write(f'<head>\n<title>{" TEST TITLE "}</title>\n</head><body>')
