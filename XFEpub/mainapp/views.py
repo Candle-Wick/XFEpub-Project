@@ -1,7 +1,8 @@
 from django.shortcuts import render
-import requests, bs4, validators, time, re
+import requests, bs4, time, re
 from pathlib import Path
-
+from django.core.validators import URLValidator
+from django.core.exceptions import ValidationError
 
 # Create your views here.
 
@@ -16,10 +17,18 @@ def api_webscrape_call():
     #If url doesnt match regex .*\/reader\/$
     # Add reader/
     #If url not valid, break.
-
     web_scraper.start_boilerplate()
 
     base_url = 'https://forums.sufficientvelocity.com/threads/warhammer-fantasy-divided-loyalties-an-advisors-quest.44838/reader/'
+
+    #TODO Test this
+    val = URLValidator(verify_exists=False)
+    if not val(base_url):
+        print("Not valid Url")
+        return
+
+    if not re.match('.*\/reader\/$', base_url):
+        base_url += 'reader/'
 
     obj = web_scraper()
     obj.webscrape(base_url)
@@ -90,7 +99,7 @@ class web_scraper:
             # Step 3. Converting each post, articles[i], into an chapter file, format.
             #The chapters title, <span class='threadmarkLabel'> articles[i].find('span', class_='threadmarkLabel')
             ##The chapter text
-            with open(f'testChapters/Chapter-{self.chapter_num}.xhtml', 'w') as f:
+            with open(f'ToZip/EPUB/Chapter-{self.chapter_num}.xhtml', 'w') as f:
                 f.write(str(articles[i].find('div', class_='bbWrapper')))
             self.chapter_num += 1
             pass
