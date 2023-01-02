@@ -11,29 +11,39 @@ def mainPage():
 
 def api_webscrape_call():
 
-    # Step 1, 
-    #Take URL, check if valid
-    #validators.url(url)
-    #If url doesnt match regex .*\/reader\/$
-    # Add reader/
-    #If url not valid, break.
-    web_scraper.start_boilerplate()
+    
 
-    base_url = 'https://forums.sufficientvelocity.com/threads/warhammer-fantasy-divided-loyalties-an-advisors-quest.44838/reader/'
+    #base_url = 'https://forums.sufficientvelocity.com/threads/warhammer-fantasy-divided-loyalties-an-advisors-quest.44838/reader/'
+    #base_url = 'Fail'
+    base_url = 'https://forums.sufficientvelocity.com/threads/warhammer-fantasy-divided-loyalties-an-advisors-quest.44838'
 
-    #TODO Test this
-    val = URLValidator(verify_exists=False)
-    if not val(base_url):
+    val = URLValidator()
+    try:
+        val(base_url)
+    except ValidationError:
         print("Not valid Url")
         return
+
+    can_continue = False
+    accepted_urls = ['spacebattles.com','sufficientvelocity.com']
+    for url in accepted_urls:
+        if url in base_url:
+            can_continue = True
+
+    if not can_continue:
+        print("Domain not accepted")
+        return
+
+    if not re.match('.*\/$', base_url):
+        base_url+= '/'
 
     if not re.match('.*\/reader\/$', base_url):
         base_url += 'reader/'
 
+    print(base_url)
     obj = web_scraper()
+    obj.start_boilerplate()
     obj.webscrape(base_url)
-    return
-
 
 class web_scraper:
 
