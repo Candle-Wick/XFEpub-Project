@@ -40,9 +40,9 @@ def api_webscrape_call():
     
 
     #base_url = 'https://forums.sufficientvelocity.com/threads/warhammer-fantasy-divided-loyalties-an-advisors-quest.44838/reader/'
-    base_url = 'Fail'
-    #base_url = 'https://forums.sufficientvelocity.com/threads/warhammer-fantasy-divided-loyalties-an-advisors-quest.44838'
-    base_url = 'https://stackoverflow.com/questions/52157937/python-return-exception-from-function'
+    #base_url = 'Fail'
+    base_url = 'https://forums.sufficientvelocity.com/threads/warhammer-fantasy-divided-loyalties-an-advisors-quest.44838'
+    #base_url = 'https://stackoverflow.com/questions/52157937/python-return-exception-from-function'
     
     try:
         base_url = check_url(base_url)
@@ -126,7 +126,7 @@ class web_scraper:
             #The chapters title, <span class='threadmarkLabel'> articles[i].find('span', class_='threadmarkLabel')
             ##The chapter text
             with open(f'ToZip/EPUB/Chapter-{self.chapter_num}.xhtml', 'w') as f:
-                f.write(str(articles[i].find('div', class_='bbWrapper').get_text(strip=True) ))
+                f.write(" ".join(str(articles[i].find('div', class_='bbWrapper') ).split()))
             self.chapter_num += 1
             pass
     
