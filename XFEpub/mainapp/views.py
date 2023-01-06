@@ -73,12 +73,12 @@ class web_scraper:
         # Fetch from user
 
         #Test without scraping
-        soup = None
-        with open('res.txt', 'r') as f:
-            soup = bs4.BeautifulSoup(f, 'html.parser')
+        # soup = None
+        # with open('res.txt', 'r') as f:
+        #     soup = bs4.BeautifulSoup(f, 'html.parser')
         
-        # response = requests.get(base_url, headers)
-        # soup = bs4.BeautifulSoup(response.content, 'html.parser')
+        response = requests.get(base_url, headers)
+        soup = bs4.BeautifulSoup(response.content, 'html.parser')
 
         self.start_boilerplate(soup)
         self.pack_articles(soup)
@@ -138,14 +138,10 @@ class web_scraper:
 
     def start_boilerplate(self, soup):
         '''Create content.opf, introduction.xhtml, nav and toc'''
-        introduction_block = soup.find('div', class_='threadmarkListingHeader')
-        h1_tag = introduction_block.find("h1")
-        h1_tag.span.decompose()
-        
-
+        thread_title = soup.find('h1', class_='p-title-value')
         with open('ToZip/EPUB/introduction.xhtml', 'w') as f:
             f.write('<?xml version=\'1.0\' encoding="utf-8"?>\n<!DOCTYPE html>\n<html xmlns="http://www.w3.org/1999/xhtml" xmlns:epub="http://www.idpf.org/2007/ops" epub:prefix="z3998: http://www.daisy.org/z3998/2012/vocab/structure/#" lang="en" xml:lang="en">')
-            f.write(f'<head>\n<title>{introduction_block.find("h1").get_text(strip=True) }</title>\n</head><body>')
+            f.write(f'<head>\n<title>{thread_title.get_text(strip=True) }</title>\n</head><body>')
 
 
     def close_boilerplate():
