@@ -10,6 +10,7 @@ def mainPage():
     return
 
 def check_url(base_url):
+    '''Checks if given URL is of right domain and if actual thread'''
     val = URLValidator()
     try:
         val(base_url)
@@ -18,7 +19,7 @@ def check_url(base_url):
         raise 
 
     can_continue = False
-    accepted_urls = ['spacebattles.com','sufficientvelocity.com']
+    accepted_urls = ['spacebattles.com/threads/','sufficientvelocity.com/threads/']
     for url in accepted_urls:
         if url in base_url:
             can_continue = True
@@ -159,13 +160,14 @@ class web_scraper:
         thread_title = soup.find('h1', class_='p-title-value')
         with open('ToZip/EPUB/introduction.xhtml', 'w') as f:
             f.write('<?xml version=\'1.0\' encoding="utf-8"?>\n<!DOCTYPE html>\n<html xmlns="http://www.w3.org/1999/xhtml" xmlns:epub="http://www.idpf.org/2007/ops" epub:prefix="z3998: http://www.daisy.org/z3998/2012/vocab/structure/#" lang="en" xml:lang="en">')
-            f.write(f'<head>\n<title>{thread_title.get_text(strip=True) }</title>\n</head><body>')
+            f.write(f'<head>\n<title>{ thread_title.get_text(strip=True) }</title>\n</head><body>')
 
+        thread_description = soup.find('article', class_='threadmarkListingHeader-extraInfoChild')
         with open('ToZip/EPUB/content.opf', 'w') as f:
-            pass
+            f.write(f'<?xml version=\'1.0\' encoding=\'utf-8\'?>\n<package xmlns="http://www.idpf.org/2007/opf" unique-identifier="id" version="3.0" prefix="rendition: http://www.idpf.org/vocab/rendition/#">zn  <metadata xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:opf="http://www.idpf.org/2007/opf">\n    <meta property="dcterms:modified">{1}</meta>\n    <meta name="generator" content="Ebook-lib 0.17.1"/>\n    <dc:identifier id="id">ot4c29vn</dc:identifier>\n    <dc:title>{thread_title.get_text(strip=True) }</dc:title>\n    <dc:language>en</dc:language>\n    <dc:creator id="creator">{1}</dc:creator>\n    <dc:description>{thread_description.get_text(strip=True)}</dc:description>\n  </metadata>\n  <manifest>')
     
         with open('ToZip/EPUB/nav.xhtml', 'w') as f:
-            pass
+            f.write(f'<?xml version=\'1.0\' encoding=\'utf-8\'?>\n<!DOCTYPE html>\n<html xmlns="http://www.w3.org/1999/xhtml" xmlns:epub="http://www.idpf.org/2007/ops" lang="en" xml:lang="en">\n  <head>\n    <title>{thread_title.get_text(strip=True) }</title>\n    <link href="style/main.css" rel="stylesheet" type="text/css"/>\n  </head>\n  <body>\n    <nav epub:type="toc" id="id" role="doc-toc">\n      <h2>{thread_title.get_text(strip=True) }</h2>')
 
         with open('ToZip/EPUB/toc', 'w') as f:
             pass
@@ -183,7 +185,7 @@ class web_scraper:
         with open('ToZip/mimetype', 'w') as f:
             f.write('application/epub+zip')
 
-        with open('ToZip/META-INF', 'w') as f:
+        with open('ToZip/META-INF/container.xml', 'w') as f:
             f.write('<?xml version="\'"1.0\' encoding=\'utf-8\'?>\n<container xmlns="urn:oasis:names:tc:opendocument:xmlns:container" version="1.0">\n  <rootfiles>\n    <rootfile media-type="application/oebps-package+xml" full-path="EPUB/content.opf"/>\n  </rootfiles>\n</container>')
 
 
