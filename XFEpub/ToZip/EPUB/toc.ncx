@@ -1,0 +1,69 @@
+<?xml version='1.0' encoding='utf-8'?>
+<ncx xmlns="http://www.daisy.org/z3986/2005/ncx/" version="2005-1">
+  <head>
+    <meta content="ot4c29vn" name="dtb:uid"/>
+    <meta content="0" name="dtb:depth"/>
+    <meta content="0" name="dtb:totalPageCount"/>
+    <meta content="0" name="dtb:maxPageNumber"/>
+  </head>
+  <docTitle>
+    <text>Warhammer Fantasy: Divided Loyalties - an Advisor's Quest</text>
+  </docTitle>
+  <navMap>    <navPoint id="intro" playOrder="1">
+     <navLabel>
+       <text>Introduction</text>
+     </navLabel>
+     <content src="introduction.xhtml"/>
+   </navPoint><navPoint id="Chapter-1" playOrder="2">
+      <navLabel>
+        <text>Chapter 1</text>
+      </navLabel>
+      <content src="Chapter-1.xhtml"/>
+    </navPoint><navPoint id="Chapter-2" playOrder="3">
+      <navLabel>
+        <text>Chapter 2</text>
+      </navLabel>
+      <content src="Chapter-2.xhtml"/>
+    </navPoint><navPoint id="Chapter-3" playOrder="4">
+      <navLabel>
+        <text>Chapter 3</text>
+      </navLabel>
+      <content src="Chapter-3.xhtml"/>
+    </navPoint><navPoint id="Chapter-4" playOrder="5">
+      <navLabel>
+        <text>Chapter 4</text>
+      </navLabel>
+      <content src="Chapter-4.xhtml"/>
+    </navPoint><navPoint id="Chapter-5" playOrder="6">
+      <navLabel>
+        <text>Chapter 5</text>
+      </navLabel>
+      <content src="Chapter-5.xhtml"/>
+    </navPoint><navPoint id="Chapter-6" playOrder="7">
+      <navLabel>
+        <text>Chapter 6</text>
+      </navLabel>
+      <content src="Chapter-6.xhtml"/>
+    </navPoint><navPoint id="Chapter-7" playOrder="8">
+      <navLabel>
+        <text>Chapter 7</text>
+      </navLabel>
+      <content src="Chapter-7.xhtml"/>
+    </navPoint><navPoint id="Chapter-8" playOrder="9">
+      <navLabel>
+        <text>Chapter 8</text>
+      </navLabel>
+      <content src="Chapter-8.xhtml"/>
+    </navPoint><navPoint id="Chapter-9" playOrder="10">
+      <navLabel>
+        <text>Chapter 9</text>
+      </navLabel>
+      <content src="Chapter-9.xhtml"/>
+    </navPoint><navPoint id="Chapter-10" playOrder="11">
+      <navLabel>
+        <text>Chapter 10</text>
+      </navLabel>
+      <content src="Chapter-10.xhtml"/>
+    </navPoint>
+  </navMap>
+</ncx>
