@@ -65,7 +65,7 @@ class web_scraper:
         #Two strings that need to be appended to content.opf in order.
         self.manifest = '\n'
         #TODO, add introduction.ncx into spine.
-        self.spine = '\n'
+        self.spine = '\n    <itemref idref="chapter_0"/>\n    <itemref idref="nav"/>'
 
     def webscrape(self, base_url):
         headers = {
@@ -87,9 +87,7 @@ class web_scraper:
 
         self.start_boilerplate(soup)
         self.pack_articles(soup)
-        
-        #FIXME delete this
-        self.close_boilerplate()
+
 
         # Calculates how many pages need to be fetched.
         pages_to_get = soup.find('ul', class_='pageNav-main')
@@ -180,10 +178,14 @@ class web_scraper:
             f.write(f'<head>\n<title>{ thread_title.get_text(strip=True) }</title>\n</head><body>')
 
         thread_description = soup.find('article', class_='threadmarkListingHeader-extraInfoChild')
+        creator = soup.find('a', class_='username').get_text()
         with open('ToZip/EPUB/content.opf', 'w') as f:
-            #TODO, add proper modified syntax
-            f.write(f'<?xml version=\'1.0\' encoding=\'utf-8\'?>\n<package xmlns="http://www.idpf.org/2007/opf" unique-identifier="id" version="3.0" prefix="rendition: http://www.idpf.org/vocab/rendition/#">\n  <metadata xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:opf="http://www.idpf.org/2007/opf">\n    <meta property="dcterms:modified">{1}</meta>\n    <meta name="generator" content="Ebook-lib 0.17.1"/>\n    <dc:identifier id="id">ot4c29vn</dc:identifier>\n    <dc:title>{thread_title.get_text(strip=True) }</dc:title>\n    <dc:language>en</dc:language>\n    <dc:creator id="creator">{1}</dc:creator>\n    <dc:description>{thread_description.get_text(strip=True)}</dc:description>\n  </metadata>\n  <manifest>\n    <item href="style/main.css" id="doc_style" media-type="text/css"/>\n    <item href="style/nav.css" id="style_nav" media-type="text/css"/>\n    <item href="introduction.xhtml" id="chapter_0" media-type="application/xhtml+xml"/>\n    <item href="nav.xhtml" id="nav" media-type="application/xhtml+xml" properties="nav"/>')
-            
+            #TODO, add proper modified syntax, <time datetime='X'>, strip and take left of +
+            #TODO, add Identifier, derive from timestamp + something?
+            f.write(f'<?xml version=\'1.0\' encoding=\'utf-8\'?>\n<package xmlns="http://www.idpf.org/2007/opf" unique-identifier="id" version="3.0" prefix="rendition: http://www.idpf.org/vocab/rendition/#">')
+            f.write(f'\n  <metadata xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:opf="http://www.idpf.org/2007/opf">\n    <meta property="dcterms:modified">2023-01-17T18:59:52z{""}</meta>\n    <meta name="generator" content="Ebook-lib 0.17.1"/>')
+            f.write(f'\n    <dc:identifier id="id">{2}</dc:identifier>\n    <dc:title>{thread_title.get_text(strip=True) }</dc:title>\n    <dc:language>en</dc:language>\n    <dc:creator id="creator">{creator}</dc:creator>\n    <dc:description>{thread_description.get_text(strip=True)}</dc:description>\n  </metadata>')
+            f.write(f'\n  <manifest>\n    <item href="style/main.css" id="doc_style" media-type="text/css"/>\n    <item href="style/nav.css" id="style_nav" media-type="text/css"/>\n    <item href="introduction.xhtml" id="chapter_0" media-type="application/xhtml+xml"/>\n    <item href="nav.xhtml" id="nav" media-type="application/xhtml+xml" properties="nav"/>')
 
         with open('ToZip/EPUB/nav.xhtml', 'w') as f:
             f.write(f'<?xml version=\'1.0\' encoding=\'utf-8\'?>\n<!DOCTYPE html>\n<html xmlns="http://www.w3.org/1999/xhtml" xmlns:epub="http://www.idpf.org/2007/ops" lang="en" xml:lang="en">\n  <head>\n    <title>{thread_title.get_text(strip=True) }</title>\n    <link href="style/main.css" rel="stylesheet" type="text/css"/>\n  </head>\n  <body>\n    <nav epub:type="toc" id="id" role="doc-toc">\n      <h2>{thread_title.get_text(strip=True) }</h2>')
@@ -202,7 +204,6 @@ class web_scraper:
             f.write('BODY {color: white;}')        
 
         with open('ToZip/EPUB/nav.xhtml', 'w') as f:
-            #f.write(f'<?xml version="1.0" encoding="utf-8"?><!DOCTYPE html><html xmlns="http://www.w3.org/1999/xhtml" xmlns:epub="http://www.idpf.org/2007/ops" lang="en" xml:lang="en"><head><title>{thread_title.get_text(strip=True)}</title><link href="style/main.css" rel="stylesheet" type="text/css"/></head><body>')
             f.write(f'<?xml version=\'1.0\' encoding=\'utf-8\'?>\n<!DOCTYPE html>\n<html xmlns="http://www.w3.org/1999/xhtml" xmlns:epub="http://www.idpf.org/2007/ops" lang="en" xml:lang="en">\n  <head>\n    <title>{thread_title.get_text(strip=True)}</title>\n    <link href="style/main.css" rel="stylesheet" type="text/css"/>\n  </head>\n  <body>\n    <nav epub:type="toc" id="id" role="doc-toc">\n      <h2>{thread_title.get_text(strip=True)}</h2>\n      <ol>')
 
         with open('ToZip/mimetype', 'w') as f:
