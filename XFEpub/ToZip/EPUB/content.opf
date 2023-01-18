@@ -1,12 +1,12 @@
 <?xml version='1.0' encoding='utf-8'?>
 <package xmlns="http://www.idpf.org/2007/opf" unique-identifier="id" version="3.0" prefix="rendition: http://www.idpf.org/vocab/rendition/#">
   <metadata xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:opf="http://www.idpf.org/2007/opf">
-    <meta property="dcterms:modified">1</meta>
+    <meta property="dcterms:modified">2023-01-18T17:32:44Z</meta>
     <meta name="generator" content="Ebook-lib 0.17.1"/>
-    <dc:identifier id="id">ot4c29vn</dc:identifier>
+    <dc:identifier id="id">595813506013357204</dc:identifier>
     <dc:title>Warhammer Fantasy: Divided Loyalties - an Advisor's Quest</dc:title>
     <dc:language>en</dc:language>
-    <dc:creator id="creator">1</dc:creator>
+    <dc:creator id="creator">Boney</dc:creator>
     <dc:description>As a Journeywoman, Grey Wizard Mathilde Weber is dropped into the deep end of intrigue and double-dealing after a surprise assignment to the necromancer-afflicted province of Stirland. Follow her trials, travails, feats and discoveries as she makes her way in the world and does her best to decide who is worthy of her trust.</dc:description>
   </metadata>
   <manifest>
@@ -27,7 +27,8 @@
     <item href="toc.ncx" id="ncx" media-type="application/x-dtbncx+xml"/>
   </manifest>
   <spine toc="ncx">
-    <itemref idref="chapter_1"/>
+    <itemref idref="chapter_0"/>
+    <itemref idref="nav"/>    <itemref idref="chapter_1"/>
     <itemref idref="chapter_2"/>
     <itemref idref="chapter_3"/>
     <itemref idref="chapter_4"/>
