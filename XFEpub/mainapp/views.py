@@ -1,5 +1,5 @@
 from django.shortcuts import render
-import requests, bs4, time, re, os, datetime, shutil
+import requests, bs4, time, re, os, datetime, zipfile, html, zlib
 from pathlib import Path
 from django.core.validators import URLValidator
 from django.core.exceptions import ValidationError
@@ -34,6 +34,8 @@ def check_url(base_url):
     if re.match('.*\/reader\/$', base_url):
         base_url.removesuffix('reader/')
 
+    #Need to catch https://forums.sufficientvelocity.com/threads/warhammer-fantasy-divided-loyalties-an-advisors-quest.44838/4/
+ 
     return base_url
 
 def api_webscrape_call():
@@ -85,9 +87,12 @@ class web_scraper:
 
         response = requests.get(base_url, self.headers)
         response.encoding = 'utf-8'
+        if response.status_code != 200:
+            raise Exception
         self.main_page_soup = bs4.BeautifulSoup(response.text, 'html.parser')
+
         self.zip_up()
-        return
+        return #
 
         time.sleep(0.1)
 
@@ -99,6 +104,8 @@ class web_scraper:
         # scrape each catagory options says too.
 
         self.close_boilerplate()
+
+        self.zip_up()
 
         # Calculates how many pages need to be fetched.
         
@@ -135,10 +142,9 @@ class web_scraper:
         last_page = pages_to_get.find_all('li')[-1]
         last_page_number = int(last_page.find('a').text)
 
-        return
         for i in range(2, last_page_number+1):
-            response = requests.get(f'{base_url}page-{i}', headers)
-            self.pack_articles(response)
+            response = requests.get(f'{reader_url}page-{i}', self.headers)
+            self.pack_articles(bs4.BeautifulSoup(response.text, 'html.parser'))
             if i % 2 ==0:
                 time.sleep(0.6)
 
@@ -155,8 +161,8 @@ class web_scraper:
             with open(f'ToZip/EPUB/Chapter-{self.chapter_num}.xhtml', 'w', encoding='utf8') as f:
                 #TODO, write as proper html file
                 f.write(f'<?xml version=\'1.0\' encoding=\'utf-8\'?>\n<!DOCTYPE html>\n<html xmlns="http://www.w3.org/1999/xhtml" xmlns:epub="http://www.idpf.org/2007/ops" epub:prefix="z3998: http://www.daisy.org/z3998/2012/vocab/structure/#" lang="en" xml:lang="en">\n  <head>\n    <title>{chapter_title}</title>\n    <link href="style/main.css" rel="stylesheet" type="text/css"/>\n  </head>\n  <body>\n    <h2>{chapter_title}</h2>\n')
-                #TODO, strip of attributes
-                f.write(str(articles[i].find('div', class_='bbWrapper').get_text() ))
+                #TODO, strip of attributes and special characters that cause problems
+                f.write(html.escape(articles[i].find('div', class_='bbWrapper').get_text() ))
                 f.write('\n  </body>\n</html>')
             
 
@@ -173,16 +179,36 @@ class web_scraper:
             self.chapter_num += 1
         
     def zip_up(self):
-        #TODO
         '''Takes the entire thing, and converts to epub file'''
-        thread_title = self.main_page_soup.find('h1', class_='p-title-value').get_text()
-        archive_name = os.path.expanduser(os.path.join('~', f'{thread_title}'))
-        shutil.make_archive(archive_name, 'zip', 'ToZip')
+        thread_title = self.main_page_soup.find('h1', class_='p-title-value').get_text().replace(" ","_")
+        #TODO Make title more flexible- absolute path it
+        if len(thread_title) > 5:
+            thread_title = thread_title[:5]
+        
+        ToZip_EPUB = Path('ToZip/EPUB')
+        ToZip_META = Path('ToZip/META-INF')
+        ToZip_Style = Path('ToZip/EPUB/style')
+
+        with zipfile.ZipFile(f'Epubs/{thread_title}.zip', 'w') as zip:
+            zip.write('ToZip/mimetype', 'mimetype')
+        with zipfile.ZipFile(f'Epubs/{thread_title}.zip', 'a', compression=zipfile.ZIP_DEFLATED) as zip:
+
+            for file_path in ToZip_EPUB.iterdir():
+                zip.write(file_path, 'EPUB/'+file_path.name.removesuffix('ToZip/'))
+            for file_path in ToZip_Style.iterdir():
+                zip.write(file_path, 'EPUB/style/'+file_path.name.removesuffix('ToZip/'))
+            for file_path in ToZip_META.iterdir():
+                zip.write(file_path, 'META-INF/'+file_path.name.removesuffix('ToZip/'))
+
+        epub_path = Path(f'Epubs/{thread_title}.zip')
+        epub_path.rename(epub_path.with_suffix('.epub'))
+
+
         return
 
 
     def start_boilerplate(self):
-        '''Create content.opf, introduction.xhtml, nav and toc'''
+        '''Creates every file that an EPUB should have, and give each file the beginning parts.'''
 
         if (not os.path.exists('ToZip/')):
             os.makedirs('ToZip/')
@@ -200,9 +226,15 @@ class web_scraper:
         thread_description = self.main_page_soup.find('article', class_='threadmarkListingHeader-extraInfoChild')
         creator = self.main_page_soup.find('a', class_='username').get_text()
         datetime_now = datetime.datetime.now().strftime("%Y-%m-%dT%H:%M:%SZ%Z")
+
         #Given that there is no UUID, DOI or ISBN typically associated with the content scraped. A hash is instead generated for a identifier that will likely be unique.
         identifier = hash(thread_title.get_text()+creator+datetime_now)
+
         with open('ToZip/EPUB/introduction.xhtml', 'w', encoding='utf8') as f:
+            #TODO, Add Status, published, words and Chapters
+            #Chapters: threadmakr count
+            #Status: Index Progress
+            #PublishedL Created at
             f.write('<?xml version=\'1.0\' encoding="utf-8"?>\n<!DOCTYPE html>\n<html xmlns="http://www.w3.org/1999/xhtml" xmlns:epub="http://www.idpf.org/2007/ops" epub:prefix="z3998: http://www.daisy.org/z3998/2012/vocab/structure/#" lang="en" xml:lang="en">')
             f.write(f'\n  <head>\n    <title>{ thread_title.get_text(strip=True) }</title>\n  </head>\n<body>')
             f.write(f"""
