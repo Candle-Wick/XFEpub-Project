@@ -1,5 +1,5 @@
 from django.shortcuts import render
-import requests, bs4, time, re, os, datetime
+import requests, bs4, time, re, os, datetime, shutil
 from pathlib import Path
 from django.core.validators import URLValidator
 from django.core.exceptions import ValidationError
@@ -31,8 +31,8 @@ def check_url(base_url):
     if not re.match('.*\/$', base_url):
         base_url+= '/'
 
-    if not re.match('.*\/reader\/$', base_url):
-        base_url += 'reader/'
+    if re.match('.*\/reader\/$', base_url):
+        base_url.removesuffix('reader/')
 
     return base_url
 
@@ -67,8 +67,8 @@ class web_scraper:
         #TODO, add introduction.ncx into spine.
         self.spine = '\n    <itemref idref="chapter_0"/>\n    <itemref idref="nav"/>'
 
-    def webscrape(self, base_url):
-        headers = {
+    def webscrape(self, base_url, options=None):
+        self.headers = {
         'Access-Control-Allow-Origin': '*',
         'Access-Control-Allow-Methods': 'GET',
         'Access-Control-Allow-Headers': 'Content-Type',
@@ -81,20 +81,27 @@ class web_scraper:
         # soup = None
         # with open('res.txt', 'r') as f:
         #     soup = bs4.BeautifulSoup(f, 'html.parser')
-        
-        response = requests.get(base_url, headers)
-        response.encoding = 'utf-8'
-        soup = bs4.BeautifulSoup(response.text, 'html.parser')
+        self.base_url = base_url
 
-        self.start_boilerplate(soup)
-        self.pack_articles(soup)
+        response = requests.get(base_url, self.headers)
+        response.encoding = 'utf-8'
+        self.main_page_soup = bs4.BeautifulSoup(response.text, 'html.parser')
+        self.zip_up()
+        return
+
+        time.sleep(0.1)
+
+        self.start_boilerplate()
+        
+        self.scrape_catagory(self.base_url+'reader/')
+        
+
+        # scrape each catagory options says too.
 
         self.close_boilerplate()
 
         # Calculates how many pages need to be fetched.
-        pages_to_get = soup.find('ul', class_='pageNav-main')
-        last_page = pages_to_get.find_all('li')[-1]
-        last_page_number = int(last_page.find('a').text)
+        
 
         #Step 2.1, update package document, manifest, spine
         # Adding all tge files and folder boilerstuff
@@ -113,17 +120,28 @@ class web_scraper:
         
         '''
 
+        # finish boilerstuff
 
-        return # TODO, Remove this
-        
+    def scrape_catagory(self, reader_url):
+        '''Scrapes an entire thread for a given catagory'''
+        print(f'{reader_url=}')
+        response = requests.get(reader_url, self.headers)
+        response.encoding = 'utf-8'
+        soup = bs4.BeautifulSoup(response.text, 'html.parser')
+
+        self.pack_articles(soup)
+
+        pages_to_get = soup.find('ul', class_='pageNav-main')
+        last_page = pages_to_get.find_all('li')[-1]
+        last_page_number = int(last_page.find('a').text)
+
+        return
         for i in range(2, last_page_number+1):
-            print(f"base_url{i}")
             response = requests.get(f'{base_url}page-{i}', headers)
             self.pack_articles(response)
             if i % 2 ==0:
                 time.sleep(0.6)
 
-        # finish boilerstuff
 
     def pack_articles(self, soup):
         '''Takes a GET Request response, and converts the chapters inside that response into chapters of the files.'''
@@ -133,9 +151,10 @@ class web_scraper:
             # Step 3. Converting each post, articles[i], into an chapter file, format.
             #The chapters title, <span class='threadmarkLabel'> articles[i].find('span', class_='threadmarkLabel')
             ##The chapter text
+            chapter_title = articles[i].find("span",class_="threadmarkLabel").get_text(strip=True)
             with open(f'ToZip/EPUB/Chapter-{self.chapter_num}.xhtml', 'w', encoding='utf8') as f:
                 #TODO, write as proper html file
-                f.write(f'<?xml version=\'1.0\' encoding=\'utf-8\'?>\n<!DOCTYPE html>\n<html xmlns="http://www.w3.org/1999/xhtml" xmlns:epub="http://www.idpf.org/2007/ops" epub:prefix="z3998: http://www.daisy.org/z3998/2012/vocab/structure/#" lang="en" xml:lang="en">\n  <head>\n    <title>Chapter {self.chapter_num}</title>\n    <link href="style/main.css" rel="stylesheet" type="text/css"/>\n  </head>\n  <body>\n    <h2>{articles[i].find("span",class_="threadmarkLabel").get_text(strip=True)}</h2>\n')
+                f.write(f'<?xml version=\'1.0\' encoding=\'utf-8\'?>\n<!DOCTYPE html>\n<html xmlns="http://www.w3.org/1999/xhtml" xmlns:epub="http://www.idpf.org/2007/ops" epub:prefix="z3998: http://www.daisy.org/z3998/2012/vocab/structure/#" lang="en" xml:lang="en">\n  <head>\n    <title>{chapter_title}</title>\n    <link href="style/main.css" rel="stylesheet" type="text/css"/>\n  </head>\n  <body>\n    <h2>{chapter_title}</h2>\n')
                 #TODO, strip of attributes
                 f.write(str(articles[i].find('div', class_='bbWrapper').get_text() ))
                 f.write('\n  </body>\n</html>')
@@ -144,7 +163,7 @@ class web_scraper:
             #Update boilerplate
             # nav needs new li
             with open('ToZip/EPUB/nav.xhtml', 'a', encoding='utf8') as f:
-                f.write(f'\n        <li>\n          <a href="Chapter-{self.chapter_num}.xhtml">Chapter {self.chapter_num}</a>\n        </li>')
+                f.write(f'\n        <li>\n          <a href="Chapter-{self.chapter_num}.xhtml">{chapter_title}</a>\n        </li>')
             # toc needs new nav point
             with open('ToZip/EPUB/toc.ncx', 'a', encoding='utf8') as f:
                 
@@ -156,10 +175,13 @@ class web_scraper:
     def zip_up(self):
         #TODO
         '''Takes the entire thing, and converts to epub file'''
+        thread_title = self.main_page_soup.find('h1', class_='p-title-value').get_text()
+        archive_name = os.path.expanduser(os.path.join('~', f'{thread_title}'))
+        shutil.make_archive(archive_name, 'zip', 'ToZip')
         return
 
 
-    def start_boilerplate(self, soup):
+    def start_boilerplate(self):
         '''Create content.opf, introduction.xhtml, nav and toc'''
 
         if (not os.path.exists('ToZip/')):
@@ -174,16 +196,33 @@ class web_scraper:
         if (not os.path.exists('ToZip/META-INF')):
             os.makedirs('ToZip/META-INF')
 
-        thread_title = soup.find('h1', class_='p-title-value')
-        thread_description = soup.find('article', class_='threadmarkListingHeader-extraInfoChild')
-        creator = soup.find('a', class_='username').get_text()
+        thread_title = self.main_page_soup.find('h1', class_='p-title-value')
+        thread_description = self.main_page_soup.find('article', class_='threadmarkListingHeader-extraInfoChild')
+        creator = self.main_page_soup.find('a', class_='username').get_text()
         datetime_now = datetime.datetime.now().strftime("%Y-%m-%dT%H:%M:%SZ%Z")
         #Given that there is no UUID, DOI or ISBN typically associated with the content scraped. A hash is instead generated for a identifier that will likely be unique.
         identifier = hash(thread_title.get_text()+creator+datetime_now)
         with open('ToZip/EPUB/introduction.xhtml', 'w', encoding='utf8') as f:
             f.write('<?xml version=\'1.0\' encoding="utf-8"?>\n<!DOCTYPE html>\n<html xmlns="http://www.w3.org/1999/xhtml" xmlns:epub="http://www.idpf.org/2007/ops" epub:prefix="z3998: http://www.daisy.org/z3998/2012/vocab/structure/#" lang="en" xml:lang="en">')
-            f.write(f'<head>\n<title>{ thread_title.get_text(strip=True) }</title>\n</head><body>')
-            #TODO, add the rest to this
+            f.write(f'\n  <head>\n    <title>{ thread_title.get_text(strip=True) }</title>\n  </head>\n<body>')
+            f.write(f"""
+    <h1>{thread_title.get_text(strip=True)}</h1>
+	<p><b>Written by: {creator}</b></p>
+	<p>{thread_description.get_text(strip=True)}</p>
+	<p>Status: {1}</p>
+	<p>Published: {4}</p>
+	
+	<p>Updated: {datetime.datetime.now().strftime("%Y-%m-%d")}</p>
+	
+	<p>Words: {11779}</p>
+	
+	<p>Chapters: {5}</p>
+	
+	<p>Original source:
+		<a rel="noopener noreferrer" href="{self.base_url}">{self.base_url}</a></p>
+	
+	<p>Exported by: <a href="{1}">XFReader</a></p>""")
+            #TODO, Add in the nessecary information
 
         with open('ToZip/EPUB/content.opf', 'w', encoding='utf8') as f:
             f.write(f'<?xml version=\'1.0\' encoding=\'utf-8\'?>\n<package xmlns="http://www.idpf.org/2007/opf" unique-identifier="id" version="3.0" prefix="rendition: http://www.idpf.org/vocab/rendition/#">')
@@ -196,7 +235,7 @@ class web_scraper:
             f.write(f'<li>\n          <a href="introduction.xhtml">Introduction</a>\n        </li>')
 
         with open('ToZip/EPUB/toc.ncx', 'w', encoding='utf8') as f:
-            f.write(f'<?xml version=\'1.0\' encoding=\'utf-8\'?>\n<ncx xmlns="http://www.daisy.org/z3986/2005/ncx/" version="2005-1">\n  <head>\n    <meta content="ot4c29vn" name="dtb:uid"/>\n    <meta content="0" name="dtb:depth"/>\n    <meta content="0" name="dtb:totalPageCount"/>\n    <meta content="0" name="dtb:maxPageNumber"/>\n  </head>\n  <docTitle>\n    <text>{thread_title.get_text(strip=True)}</text>\n  </docTitle>\n  <navMap>')
+            f.write(f'<?xml version=\'1.0\' encoding=\'utf-8\'?>\n<ncx xmlns="http://www.daisy.org/z3986/2005/ncx/" version="2005-1">\n  <head>\n    <meta content="{identifier}" name="dtb:uid"/>\n    <meta content="0" name="dtb:depth"/>\n    <meta content="0" name="dtb:totalPageCount"/>\n    <meta content="0" name="dtb:maxPageNumber"/>\n  </head>\n  <docTitle>\n    <text>{thread_title.get_text(strip=True)}</text>\n  </docTitle>\n  <navMap>')
             f.write(f'    <navPoint id="intro" playOrder="1">\n     <navLabel>\n       <text>Introduction</text>\n     </navLabel>\n     <content src="introduction.xhtml"/>\n   </navPoint>')
 
 
@@ -222,7 +261,7 @@ class web_scraper:
 
 
         with open('ToZip/EPUB/introduction.xhtml', 'a', encoding='utf8') as f:
-            f.write('</body>\n</html>')
+            f.write('\n  </body>\n</html>')
 
         with open('ToZip/EPUB/content.opf', 'a', encoding='utf8') as f:
             f.write(self.manifest)
