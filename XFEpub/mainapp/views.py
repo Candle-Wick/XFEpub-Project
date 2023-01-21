@@ -1,5 +1,5 @@
 from django.shortcuts import render
-import requests, bs4, time, re, os, datetime, zipfile, html, zlib
+import requests, bs4, time, re, os, datetime, zipfile, html, shutil
 from pathlib import Path
 from django.core.validators import URLValidator
 from django.core.exceptions import ValidationError
@@ -66,10 +66,10 @@ class web_scraper:
         self.chapter_num = 1
         #Two strings that need to be appended to content.opf in order.
         self.manifest = '\n'
-        #TODO, add introduction.ncx into spine.
-        self.spine = '\n    <itemref idref="chapter_0"/>\n    <itemref idref="nav"/>'
+        self.spine = '\n    <itemref idref="chapter_0"/>\n    <itemref idref="nav"/>\n'
+        self.clear_ToZip()
 
-    def webscrape(self, base_url, options=None):
+    def webscrape(self, base_url, options=[4]):
         self.headers = {
         'Access-Control-Allow-Origin': '*',
         'Access-Control-Allow-Methods': 'GET',
@@ -91,14 +91,17 @@ class web_scraper:
             raise Exception
         self.main_page_soup = bs4.BeautifulSoup(response.text, 'html.parser')
 
-        self.zip_up()
-        return #
 
         time.sleep(0.1)
 
         self.start_boilerplate()
         
         self.scrape_catagory(self.base_url+'reader/')
+
+        if (options):
+            for i in range(0,len(options)):
+                # Options contains an array of numbers that represent each threadmark catagory. 
+                self.scrape_catagory(self.base_url+f'{options[i]}/reader/', options[i])
         
 
         # scrape each catagory options says too.
@@ -129,15 +132,18 @@ class web_scraper:
 
         # finish boilerstuff
 
-    def scrape_catagory(self, reader_url):
+    def scrape_catagory(self, reader_url, catagory=0):
         '''Scrapes an entire thread for a given catagory'''
-        print(f'{reader_url=}')
         response = requests.get(reader_url, self.headers)
         response.encoding = 'utf-8'
         soup = bs4.BeautifulSoup(response.text, 'html.parser')
 
-        self.pack_articles(soup)
+        with open('ToZip/EPUB/nav.xhtml', 'a', encoding='utf8') as f:
+            subheadings = {0:'Threadmarks', 4:'Apocrypha', 3:'Media', 6:'Informational', 16:'Sidestory', 13:'Apocrypha', 19:'Informational'}
+            f.write(f'\n        <li>\n          <h3>{subheadings[catagory]}</h3>\n        </li>')
 
+        self.pack_articles(soup)
+        return
         pages_to_get = soup.find('ul', class_='pageNav-main')
         last_page = pages_to_get.find_all('li')[-1]
         last_page_number = int(last_page.find('a').text)
@@ -159,17 +165,17 @@ class web_scraper:
             ##The chapter text
             chapter_title = articles[i].find("span",class_="threadmarkLabel").get_text(strip=True)
             with open(f'ToZip/EPUB/Chapter-{self.chapter_num}.xhtml', 'w', encoding='utf8') as f:
-                #TODO, write as proper html file
                 f.write(f'<?xml version=\'1.0\' encoding=\'utf-8\'?>\n<!DOCTYPE html>\n<html xmlns="http://www.w3.org/1999/xhtml" xmlns:epub="http://www.idpf.org/2007/ops" epub:prefix="z3998: http://www.daisy.org/z3998/2012/vocab/structure/#" lang="en" xml:lang="en">\n  <head>\n    <title>{chapter_title}</title>\n    <link href="style/main.css" rel="stylesheet" type="text/css"/>\n  </head>\n  <body>\n    <h2>{chapter_title}</h2>\n')
                 #TODO, strip of attributes and special characters that cause problems
-                f.write(html.escape(articles[i].find('div', class_='bbWrapper').get_text() ))
+                text_body = articles[i].find('div', class_='bbWrapper')
+                f.write(str(articles[i].find('div', class_='bbWrapper')) )
                 f.write('\n  </body>\n</html>')
             
 
             #Update boilerplate
             # nav needs new li
             with open('ToZip/EPUB/nav.xhtml', 'a', encoding='utf8') as f:
-                f.write(f'\n        <li>\n          <a href="Chapter-{self.chapter_num}.xhtml">{chapter_title}</a>\n        </li>')
+                f.write(f'\n        <li>\n          <a href="Chapter-{self.chapter_num}.xhtml">  {chapter_title}</a>\n        </li>')
             # toc needs new nav point
             with open('ToZip/EPUB/toc.ncx', 'a', encoding='utf8') as f:
                 
@@ -306,3 +312,7 @@ class web_scraper:
 
         with open('ToZip/EPUB/toc.ncx', 'a', encoding='utf8') as f:
             f.write('\n  </navMap>\n</ncx>')
+
+    def clear_ToZip(self):
+        dir = 'ToZip/EPUB'
+        shutil.rmtree(dir)
