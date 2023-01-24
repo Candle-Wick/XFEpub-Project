@@ -7,8 +7,10 @@ from django.core.exceptions import ValidationError
 from .web_scraper import *
 # Create your views here.
 
-def mainPage():
-    return
+def mainPage(request):
+    return render(request, "index.html", {})
+
+
 
 def check_url(base_url):
     '''Checks if given URL is of right domain and if actual thread'''
@@ -58,3 +60,4 @@ def api_webscrape_call():
 
     obj = web_scraper()
     print(obj.webscrape(base_url))
+    #Now, send FIle off to Client to download at leisure.

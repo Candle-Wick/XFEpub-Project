@@ -2,6 +2,8 @@ import requests, bs4, time, os, datetime, zipfile, html, shutil
 from pathlib import Path
 class web_scraper:
 
+    #TODO Rethink entire file storage idea.
+
     chapter_num = 1
 
     def __init__(self) -> None:
@@ -269,5 +271,6 @@ class web_scraper:
             f.write('\n  </navMap>\n</ncx>')
 
     def clear_ToZip(self):
+        '''Empties ToZip of the last EPUB checked.'''
         dir = 'ToZip/EPUB'
         shutil.rmtree(dir)
