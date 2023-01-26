@@ -1,7 +1,7 @@
 <?xml version='1.0' encoding='utf-8'?>
 <ncx xmlns="http://www.daisy.org/z3986/2005/ncx/" version="2005-1">
   <head>
-    <meta content="-2629830984982449704" name="dtb:uid"/>
+    <meta content="701440403066972547" name="dtb:uid"/>
     <meta content="0" name="dtb:depth"/>
     <meta content="0" name="dtb:totalPageCount"/>
     <meta content="0" name="dtb:maxPageNumber"/>
@@ -64,56 +64,6 @@
         <text>Chapter 10</text>
       </navLabel>
       <content src="Chapter-10.xhtml"/>
-    </navPoint><navPoint id="Chapter-11" playOrder="12">
-      <navLabel>
-        <text>Chapter 11</text>
-      </navLabel>
-      <content src="Chapter-11.xhtml"/>
-    </navPoint><navPoint id="Chapter-12" playOrder="13">
-      <navLabel>
-        <text>Chapter 12</text>
-      </navLabel>
-      <content src="Chapter-12.xhtml"/>
-    </navPoint><navPoint id="Chapter-13" playOrder="14">
-      <navLabel>
-        <text>Chapter 13</text>
-      </navLabel>
-      <content src="Chapter-13.xhtml"/>
-    </navPoint><navPoint id="Chapter-14" playOrder="15">
-      <navLabel>
-        <text>Chapter 14</text>
-      </navLabel>
-      <content src="Chapter-14.xhtml"/>
-    </navPoint><navPoint id="Chapter-15" playOrder="16">
-      <navLabel>
-        <text>Chapter 15</text>
-      </navLabel>
-      <content src="Chapter-15.xhtml"/>
-    </navPoint><navPoint id="Chapter-16" playOrder="17">
-      <navLabel>
-        <text>Chapter 16</text>
-      </navLabel>
-      <content src="Chapter-16.xhtml"/>
-    </navPoint><navPoint id="Chapter-17" playOrder="18">
-      <navLabel>
-        <text>Chapter 17</text>
-      </navLabel>
-      <content src="Chapter-17.xhtml"/>
-    </navPoint><navPoint id="Chapter-18" playOrder="19">
-      <navLabel>
-        <text>Chapter 18</text>
-      </navLabel>
-      <content src="Chapter-18.xhtml"/>
-    </navPoint><navPoint id="Chapter-19" playOrder="20">
-      <navLabel>
-        <text>Chapter 19</text>
-      </navLabel>
-      <content src="Chapter-19.xhtml"/>
-    </navPoint><navPoint id="Chapter-20" playOrder="21">
-      <navLabel>
-        <text>Chapter 20</text>
-      </navLabel>
-      <content src="Chapter-20.xhtml"/>
     </navPoint>
   </navMap>
 </ncx>

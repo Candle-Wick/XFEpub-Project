@@ -1,9 +1,9 @@
 <?xml version='1.0' encoding='utf-8'?>
 <package xmlns="http://www.idpf.org/2007/opf" unique-identifier="id" version="3.0" prefix="rendition: http://www.idpf.org/vocab/rendition/#">
   <metadata xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:opf="http://www.idpf.org/2007/opf">
-    <meta property="dcterms:modified">2023-01-22T15:12:30Z</meta>
+    <meta property="dcterms:modified">2023-01-26T10:14:21Z</meta>
     <meta name="generator" content="Ebook-lib 0.17.1"/>
-    <dc:identifier id="id">-2629830984982449704</dc:identifier>
+    <dc:identifier id="id">701440403066972547</dc:identifier>
     <dc:title>Warhammer Fantasy: Divided Loyalties - an Advisor's Quest</dc:title>
     <dc:language>en</dc:language>
     <dc:creator id="creator">Boney</dc:creator>
@@ -24,16 +24,6 @@
     <item href="Chapter-8.xhtml" id="chapter_8" media-type="application/xhtml+xml"/>
     <item href="Chapter-9.xhtml" id="chapter_9" media-type="application/xhtml+xml"/>
     <item href="Chapter-10.xhtml" id="chapter_10" media-type="application/xhtml+xml"/>
-    <item href="Chapter-11.xhtml" id="chapter_11" media-type="application/xhtml+xml"/>
-    <item href="Chapter-12.xhtml" id="chapter_12" media-type="application/xhtml+xml"/>
-    <item href="Chapter-13.xhtml" id="chapter_13" media-type="application/xhtml+xml"/>
-    <item href="Chapter-14.xhtml" id="chapter_14" media-type="application/xhtml+xml"/>
-    <item href="Chapter-15.xhtml" id="chapter_15" media-type="application/xhtml+xml"/>
-    <item href="Chapter-16.xhtml" id="chapter_16" media-type="application/xhtml+xml"/>
-    <item href="Chapter-17.xhtml" id="chapter_17" media-type="application/xhtml+xml"/>
-    <item href="Chapter-18.xhtml" id="chapter_18" media-type="application/xhtml+xml"/>
-    <item href="Chapter-19.xhtml" id="chapter_19" media-type="application/xhtml+xml"/>
-    <item href="Chapter-20.xhtml" id="chapter_20" media-type="application/xhtml+xml"/>
     <item href="toc.ncx" id="ncx" media-type="application/x-dtbncx+xml"/>
   </manifest>
   <spine toc="ncx">
@@ -49,15 +39,5 @@
     <itemref idref="chapter_8"/>
     <itemref idref="chapter_9"/>
     <itemref idref="chapter_10"/>
-    <itemref idref="chapter_11"/>
-    <itemref idref="chapter_12"/>
-    <itemref idref="chapter_13"/>
-    <itemref idref="chapter_14"/>
-    <itemref idref="chapter_15"/>
-    <itemref idref="chapter_16"/>
-    <itemref idref="chapter_17"/>
-    <itemref idref="chapter_18"/>
-    <itemref idref="chapter_19"/>
-    <itemref idref="chapter_20"/>
   </spine>
 </package>

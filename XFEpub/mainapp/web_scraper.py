@@ -1,4 +1,4 @@
-import requests, bs4, time, os, datetime, zipfile, html, shutil
+import requests, bs4, time, os, datetime, zipfile, shutil, re
 from pathlib import Path
 class web_scraper:
 
@@ -11,11 +11,12 @@ class web_scraper:
         #Two strings that need to be appended to content.opf in order.
         self.manifest = '\n'
         self.spine = '\n    <itemref idref="chapter_0"/>\n    <itemref idref="nav"/>\n'
+        self.toc_list = ''
+        self.nav_list = ''
         self.word_count = 0
-        self.chapter_count = 0
         self.clear_ToZip()
 
-    def webscrape(self, base_url, options=[4]):
+    def webscrape(self, base_url, options=[]):
         self.headers = {
         'Access-Control-Allow-Origin': '*',
         'Access-Control-Allow-Methods': 'GET',
@@ -40,7 +41,7 @@ class web_scraper:
 
         time.sleep(0.1)
 
-        self.start_boilerplate()
+
         
         self.scrape_catagory(self.base_url+'reader/')
 
@@ -52,6 +53,8 @@ class web_scraper:
 
         # scrape each catagory options says too.
 
+
+        self.start_boilerplate()
         self.close_boilerplate()
 
         return self.zip_up()
@@ -84,9 +87,9 @@ class web_scraper:
         response.encoding = 'utf-8'
         soup = bs4.BeautifulSoup(response.text, 'html.parser')
 
-        with open('ToZip/EPUB/nav.xhtml', 'a', encoding='utf8') as f:
-            subheadings = {0:'Threadmarks', 4:'Apocrypha', 3:'Media', 6:'Informational', 16:'Sidestory', 13:'Apocrypha', 19:'Informational'}
-            f.write(f'\n        <li>\n          <h3>{subheadings[catagory]}</h3>\n        </li>')
+        subheadings = {0:'Threadmarks', 4:'Apocrypha', 3:'Media', 6:'Informational', 16:'Sidestory', 13:'Apocrypha', 19:'Informational'}
+        self.nav_list += f'\n        <li>\n          <h3>{subheadings[catagory]}</h3>\n        </li>'
+
 
         self.pack_articles(soup)
         return
@@ -112,35 +115,25 @@ class web_scraper:
             chapter_title = articles[i].find("span",class_="threadmarkLabel").get_text(strip=True)
             with open(f'ToZip/EPUB/Chapter-{self.chapter_num}.xhtml', 'w', encoding='utf8') as f:
                 f.write(f'<?xml version=\'1.0\' encoding=\'utf-8\'?>\n<!DOCTYPE html>\n<html xmlns="http://www.w3.org/1999/xhtml" xmlns:epub="http://www.idpf.org/2007/ops" epub:prefix="z3998: http://www.daisy.org/z3998/2012/vocab/structure/#" lang="en" xml:lang="en">\n  <head>\n    <title>{chapter_title}</title>\n    <link href="style/main.css" rel="stylesheet" type="text/css"/>\n  </head>\n  <body>\n    <h2>{chapter_title}</h2>\n')
-                #TODO, strip of attributes and special characters that cause problems
-                #noscript
-                # width and height attributes
                 text_body = articles[i].find('div', class_='bbWrapper')
                 f.write(str(text_body) )
                 f.write('\n  </body>\n</html>')
 
-                self.chapter_count += 1
                 self.word_count +=  len(str(text_body).split(' '))
-            
 
-            #Update boilerplate
-            # nav needs new li
-            with open('ToZip/EPUB/nav.xhtml', 'a', encoding='utf8') as f:
-                f.write(f'\n        <li>\n          <a href="Chapter-{self.chapter_num}.xhtml">  {chapter_title}</a>\n        </li>')
-            # toc needs new nav point
-            with open('ToZip/EPUB/toc.ncx', 'a', encoding='utf8') as f:
-                
-                f.write(f'<navPoint id="Chapter-{self.chapter_num}" playOrder="{self.chapter_num + 1}">\n      <navLabel>\n        <text>Chapter {self.chapter_num}</text>\n      </navLabel>\n      <content src="Chapter-{self.chapter_num}.xhtml"/>\n    </navPoint>')
+            self.nav_list += f'\n        <li>\n          <a href="Chapter-{self.chapter_num}.xhtml">  {chapter_title}</a>\n        </li>'
+            self.toc_list += f'<navPoint id="Chapter-{self.chapter_num}" playOrder="{self.chapter_num + 1}">\n      <navLabel>\n        <text>Chapter {self.chapter_num}</text>\n      </navLabel>\n      <content src="Chapter-{self.chapter_num}.xhtml"/>\n    </navPoint>'    
             self.manifest += f'    <item href="Chapter-{self.chapter_num}.xhtml" id="chapter_{self.chapter_num}" media-type="application/xhtml+xml"/>\n'
             self.spine += f'    <itemref idref="chapter_{self.chapter_num}"/>\n'
             self.chapter_num += 1
         
     def zip_up(self):
         '''Takes the entire thing, and converts to epub file, returns path to file.'''
-        thread_title = self.main_page_soup.find('h1', class_='p-title-value').get_text().replace(" ","_")
+        thread_title = self.main_page_soup.find('h1', class_='p-title-value').get_text()
+        thread_title = " ".join(thread_title.split()).replace(" ", "_")
+        thread_title = "".join([c for c in thread_title if re.match(r'\w', c)])
         #TODO Make title more flexible- absolute path it
-        if len(thread_title) > 5:
-            thread_title = thread_title[:5]
+
         
         ToZip_EPUB = Path('ToZip/EPUB')
         ToZip_META = Path('ToZip/META-INF')
@@ -171,47 +164,33 @@ class web_scraper:
 
 
     def start_boilerplate(self):
-        '''Creates every file that an EPUB should have, and give each file the beginning parts.'''
-
-        if (not os.path.exists('ToZip/')):
-            os.makedirs('ToZip/')
-
-        if (not os.path.exists('ToZip/EPUB/')):
-            os.makedirs('ToZip/EPUB/')
-
-        if (not os.path.exists('ToZip/EPUB/style')):
-            os.makedirs('ToZip/EPUB/style')
-
-        if (not os.path.exists('ToZip/META-INF')):
-            os.makedirs('ToZip/META-INF')
+        '''Gives each file the beginning parts, standard for a epub file.'''
 
         thread_title = self.main_page_soup.find('h1', class_='p-title-value')
         thread_description = self.main_page_soup.find('article', class_='threadmarkListingHeader-extraInfoChild')
         creator = self.main_page_soup.find('a', class_='username').get_text()
         datetime_now = datetime.datetime.now().strftime("%Y-%m-%dT%H:%M:%SZ%Z")
-
+        pair_rows = self.main_page_soup.find_all('dl', class_='pairs--rows')
+        creation_date = pair_rows[0].find('dd').get_text()
+        index_progress = pair_rows[1].find('dd').get_text()
         #Given that there is no UUID, DOI or ISBN typically associated with the content scraped. A hash is instead generated for a identifier that will likely be unique.
         identifier = hash(thread_title.get_text()+creator+datetime_now)
 
         with open('ToZip/EPUB/introduction.xhtml', 'w', encoding='utf8') as f:
-            #TODO, Add Status, published, words and Chapters
-            #Chapters: threadmakr count
-            #Status: Index Progress
-            #PublishedL Created at
             f.write('<?xml version=\'1.0\' encoding="utf-8"?>\n<!DOCTYPE html>\n<html xmlns="http://www.w3.org/1999/xhtml" xmlns:epub="http://www.idpf.org/2007/ops" epub:prefix="z3998: http://www.daisy.org/z3998/2012/vocab/structure/#" lang="en" xml:lang="en">')
             f.write(f'\n  <head>\n    <title>{ thread_title.get_text(strip=True) }</title>\n  </head>\n<body>')
             f.write(f"""
     <h1>{thread_title.get_text(strip=True)}</h1>
 	<p><b>Written by: {creator}</b></p>
 	<p>{thread_description.get_text(strip=True)}</p>
-	<p>Status: {1}</p>
-	<p>Published: {4}</p>
+	<p>Status: {index_progress}</p>
+	<p>Published: {creation_date}</p>
 	
 	<p>Updated: {datetime.datetime.now().strftime("%Y-%m-%d")}</p>
 	
 	<p>Words: {self.word_count}</p>
 	
-	<p>Chapters: {self.chapter_count}</p>
+	<p>Chapters: {self.chapter_num-1}</p>
 	
 	<p>Original source:
 		<a rel="noopener noreferrer" href="{self.base_url}">{self.base_url}</a></p>
@@ -226,13 +205,16 @@ class web_scraper:
             f.write(f'\n  <manifest>\n    <item href="style/main.css" id="doc_style" media-type="text/css"/>\n    <item href="style/nav.css" id="style_nav" media-type="text/css"/>\n    <item href="introduction.xhtml" id="chapter_0" media-type="application/xhtml+xml"/>\n    <item href="nav.xhtml" id="nav" media-type="application/xhtml+xml" properties="nav"/>')
 
         with open('ToZip/EPUB/nav.xhtml', 'w', encoding='utf8') as f:
-            f.write(f'<?xml version=\'1.0\' encoding=\'utf-8\'?>\n<!DOCTYPE html>\n<html xmlns="http://www.w3.org/1999/xhtml" xmlns:epub="http://www.idpf.org/2007/ops" lang="en" xml:lang="en">\n  <head>\n    <title>{thread_title.get_text(strip=True) }</title>\n    <link href="style/main.css" rel="stylesheet" type="text/css"/>\n  </head>\n  <body>\n    <nav epub:type="toc" id="id" role="doc-toc">\n      <h2>{thread_title.get_text(strip=True) }</h2>')
-            f.write(f'<li>\n          <a href="introduction.xhtml">Introduction</a>\n        </li>')
+            f.write(f'<?xml version=\'1.0\' encoding=\'utf-8\'?>\n<!DOCTYPE html>\n<html xmlns="http://www.w3.org/1999/xhtml" xmlns:epub="http://www.idpf.org/2007/ops" lang="en" xml:lang="en">\n  <head>\n    <title>{thread_title.get_text(strip=True) }</title>\n    <link href="style/main.css" rel="stylesheet" type="text/css"/>\n  </head>\n  <body>\n    <nav epub:type="toc" id="id" role="doc-toc">\n      <h2>{thread_title.get_text(strip=True) }</h2>\n')
+            f.write(f'      <ol>\n        <li>\n          <a href="introduction.xhtml">Introduction</a>\n        </li>')
+            f.write(self.nav_list)
+
+            
 
         with open('ToZip/EPUB/toc.ncx', 'w', encoding='utf8') as f:
             f.write(f'<?xml version=\'1.0\' encoding=\'utf-8\'?>\n<ncx xmlns="http://www.daisy.org/z3986/2005/ncx/" version="2005-1">\n  <head>\n    <meta content="{identifier}" name="dtb:uid"/>\n    <meta content="0" name="dtb:depth"/>\n    <meta content="0" name="dtb:totalPageCount"/>\n    <meta content="0" name="dtb:maxPageNumber"/>\n  </head>\n  <docTitle>\n    <text>{thread_title.get_text(strip=True)}</text>\n  </docTitle>\n  <navMap>')
             f.write(f'    <navPoint id="intro" playOrder="1">\n     <navLabel>\n       <text>Introduction</text>\n     </navLabel>\n     <content src="introduction.xhtml"/>\n   </navPoint>')
-
+            f.write(self.toc_list)
 
         # The defaullt boilerplate, requires nothing from what is fetched.
         with open('ToZip/EPUB/style/main.css', 'w', encoding='utf8') as f:
@@ -241,8 +223,6 @@ class web_scraper:
         with open('ToZip/EPUB/style/nav.css', 'w', encoding='utf8') as f:
             f.write('BODY {color: white;}')        
 
-        with open('ToZip/EPUB/nav.xhtml', 'w', encoding='utf8') as f:
-            f.write(f'<?xml version=\'1.0\' encoding=\'utf-8\'?>\n<!DOCTYPE html>\n<html xmlns="http://www.w3.org/1999/xhtml" xmlns:epub="http://www.idpf.org/2007/ops" lang="en" xml:lang="en">\n  <head>\n    <title>{thread_title.get_text(strip=True)}</title>\n    <link href="style/main.css" rel="stylesheet" type="text/css"/>\n  </head>\n  <body>\n    <nav epub:type="toc" id="id" role="doc-toc">\n      <h2>{thread_title.get_text(strip=True)}</h2>\n      <ol>')
 
         with open('ToZip/mimetype', 'w', encoding='utf8') as f:
             f.write('application/epub+zip')
@@ -273,4 +253,17 @@ class web_scraper:
     def clear_ToZip(self):
         '''Empties ToZip of the last EPUB checked.'''
         dir = 'ToZip/EPUB'
-        shutil.rmtree(dir)
+        if (os.path.exists('ToZip/EPUB/')):
+            shutil.rmtree(dir)
+        
+        if (not os.path.exists('ToZip/')):
+            os.makedirs('ToZip/')
+
+        if (not os.path.exists('ToZip/EPUB/')):
+            os.makedirs('ToZip/EPUB/')
+
+        if (not os.path.exists('ToZip/EPUB/style')):
+            os.makedirs('ToZip/EPUB/style')
+
+        if (not os.path.exists('ToZip/META-INF')):
+            os.makedirs('ToZip/META-INF')
