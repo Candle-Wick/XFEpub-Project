@@ -132,9 +132,7 @@ class web_scraper:
         thread_title = self.main_page_soup.find('h1', class_='p-title-value').get_text()
         thread_title = " ".join(thread_title.split()).replace(" ", "_")
         thread_title = "".join([c for c in thread_title if re.match(r'\w', c)])
-        #TODO Make title more flexible- absolute path it
 
-        
         ToZip_EPUB = Path('ToZip/EPUB')
         ToZip_META = Path('ToZip/META-INF')
         ToZip_Style = Path('ToZip/EPUB/style')
@@ -196,7 +194,7 @@ class web_scraper:
 		<a rel="noopener noreferrer" href="{self.base_url}">{self.base_url}</a></p>
 	
 	<p>Exported by: <a href="{1}">XFReader</a></p>""")
-            #TODO, Add in the nessecary information
+            #TODO, Add in the url to the site here.
 
         with open('ToZip/EPUB/content.opf', 'w', encoding='utf8') as f:
             f.write(f'<?xml version=\'1.0\' encoding=\'utf-8\'?>\n<package xmlns="http://www.idpf.org/2007/opf" unique-identifier="id" version="3.0" prefix="rendition: http://www.idpf.org/vocab/rendition/#">')
