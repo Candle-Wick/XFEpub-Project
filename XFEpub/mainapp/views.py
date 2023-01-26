@@ -48,6 +48,7 @@ def api_webscrape_call():
     #base_url = 'https://forums.sufficientvelocity.com/threads/warhammer-fantasy-divided-loyalties-an-advisors-quest.44838/reader/'
     #base_url = 'Fail'
     base_url = 'https://forums.sufficientvelocity.com/threads/warhammer-fantasy-divided-loyalties-an-advisors-quest.44838'
+    base_url = 'https://forums.sufficientvelocity.com/threads/from-the-brink-blood-ravens-quest-warhammer-40k.23731/'
     #base_url = 'https://stackoverflow.com/questions/52157937/python-return-exception-from-function'
     
     try:

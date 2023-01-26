@@ -49,6 +49,7 @@ class web_scraper:
             for i in range(0,len(options)):
                 # Options contains an array of numbers that represent each threadmark catagory. 
                 self.scrape_catagory(self.base_url+f'{options[i]}/reader/', options[i])
+                self.sleep(0.2)
         
 
         # scrape each catagory options says too.
@@ -92,7 +93,7 @@ class web_scraper:
 
 
         self.pack_articles(soup)
-        return
+
         pages_to_get = soup.find('ul', class_='pageNav-main')
         last_page = pages_to_get.find_all('li')[-1]
         last_page_number = int(last_page.find('a').text)
@@ -100,8 +101,7 @@ class web_scraper:
         for i in range(2, last_page_number+1):
             response = requests.get(f'{reader_url}page-{i}', self.headers)
             self.pack_articles(bs4.BeautifulSoup(response.text, 'html.parser'))
-            if i % 2 ==0:
-                time.sleep(0.6)
+            time.sleep(0.3)
 
 
     def pack_articles(self, soup):
