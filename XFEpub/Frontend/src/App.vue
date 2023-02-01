@@ -8,7 +8,7 @@ import mainBody from './components/main.vue'
 
 <template>
   <div>
-    <div class="container-xxl-fluid rounded" style="background: rgba(250,250,0,0.2); max-width: 90%; margin: auto;">
+    <div class="container-xxl-fluid rounded" style="background: rgba(150,100,0,0.2); max-width: 90%; margin: auto;">
     <mainBody class=""/>
     </div>
   </div>
