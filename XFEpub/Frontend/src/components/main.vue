@@ -2,7 +2,7 @@
 </script>
 
 <template>
-    <div class="">
+    <div class="border p-5">
         <form action="">
             <label for="thread_url" class="form-label">Choose a thread to download:</label>
             <input type="url" id="thread_url" name="thread_url" class="form-control">
