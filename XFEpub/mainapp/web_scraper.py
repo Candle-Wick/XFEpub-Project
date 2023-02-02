@@ -88,7 +88,7 @@ class web_scraper:
         response.encoding = 'utf-8'
         soup = bs4.BeautifulSoup(response.text, 'html.parser')
 
-        subheadings = {0:'Threadmarks', 4:'Apocrypha', 3:'Media', 6:'Informational', 16:'Sidestory', 13:'Apocrypha', 19:'Informational'}
+        subheadings = {0:'Threadmarks', 4:'Apocrypha', 3:'Media', 10:'Media', 6:'Informational', 16:'Sidestory', 13:'Apocrypha', 19:'Informational'}
         self.nav_list += f'\n        <li>\n          <h3>{subheadings[catagory]}</h3>\n        </li>'
 
 
