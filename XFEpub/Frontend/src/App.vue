@@ -7,11 +7,11 @@ import mainBody from './components/main.vue'
 </script>
 
 <template>
-  <div>
-    <div class="container-xxl-fluid rounded" style="background: rgba(150,100,0,0.2); max-width: 90%; margin: auto;">
+
+  <div class="container-xxl-fluid rounded" style="background: rgba(234,224,204,1); max-width: 99%; margin: auto;">
     <mainBody class=""/>
-    </div>
   </div>
+
 
 
   <!-- <header>

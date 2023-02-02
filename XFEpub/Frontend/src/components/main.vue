@@ -2,7 +2,7 @@
 </script>
 
 <template>
-    <div class="border p-5 m-2">
+    <div class="border-rounded p-5 m-2">
         <h1 class="">XenForo Thread Downloader</h1>
 
 
@@ -55,12 +55,26 @@
               <label for="media" class="form-check-label ms-3"> Media <small class="">NB: Fetched posts will not have embedded images. </small></label>
             </div>
           </div>
-            
-
-
 
         </form>
+                     
+        <div class="mt-5 d-flex justify-content-center">
+            <div class="text-start">
+            <h1>About</h1>
+            <br/>
+            <p >This is a final project focused around giving an user the ability to download a fiction hosted on a XenForo based site. <br/>
+              To use, enter an valid URL into the textbox. A valid URL is a url that belongs to Spacebattles.com or SufficientVelocity.com, that points towards the thread of a story. <br/>
+              Example URLs:
+              <ul class="list-group">
+                <li class="list-group-item">https://forums.spacebattles.com/threads/the-great-caretaker-of-gaia-overlord-si-player.1069790/</li>
+                <li class="list-group-item">https://forums.sufficientvelocity.com/threads/hybrid-hive-eat-shard-worm-mgln.55056/</li>
+                <li class="list-group-item">https://forums.sufficientvelocity.com/threads/reverse-engineering-is-not-that-easy-planetary-annihilation-multicross-si.108388/</li>
+              </ul>
 
+              <!-- Something about choosing wich parts to grab. -->
+            </p>
+            </div>
+          </div>
 
         <small innerText="Tab Icon: Koreller, CC BY-SA 4.0 <https://creativecommons.org/licenses/by-sa/4.0>, via Wikimedia Commons" class="">
         </small>
