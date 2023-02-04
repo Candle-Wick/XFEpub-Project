@@ -3,6 +3,7 @@ import requests, bs4, time, re, os, datetime, zipfile, html, shutil
 from pathlib import Path
 from django.core.validators import URLValidator
 from django.core.exceptions import ValidationError
+from django.http import HttpRequest
 
 from .web_scraper import *
 # Create your views here.
@@ -41,7 +42,7 @@ def check_url(base_url):
  
     return base_url
 
-def api_webscrape_call():
+def api_webscrape_call(request: HttpRequest):
 
     
 

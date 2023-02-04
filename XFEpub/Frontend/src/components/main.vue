@@ -6,53 +6,62 @@
         <h1 class="">XenForo Thread Downloader</h1>
 
 
-        <form action="" class="container">
+        <form action="" class="container" v-on:submit.prevent="detectURL">
           <div class="row">
             <label for="thread_url" class="form-label">Choose a thread to download:</label>
-            <input type="url" id="thread_url" name="thread_url" class="form-control" style="font-size: 1.4em;">
+            <input type="url" id="thread_url" name="thread_url" class="form-control" style="font-size: 1.4em;" v-model="url" @keyup.enter="">
+            <small class="hidden mt-2 text-danger" id="url_error">{{ this.url_error_msg }}</small>
 
-            </div>
-
-          <div class="row mt-5">
-            <div class="col-2">
-              <label class="switch">
-                  <input type="checkbox" id="acrophyca">
-                  <span class="slider round"></span>
-              </label>
-            </div>
-            <div class="col-4">
-              <label for="acrophyca" class="form-check-label ms-3">acrophyca</label>
-            </div>
-            <div class="col-2">
-              <label class="switch">
-                  <input type="checkbox" id="sidestory">
-                  <span class="slider round"></span>
-              </label>
-            </div>
-            <div class="col-4">
-              <label for="sidestory" class="form-check-label ms-3">Sidestory</label>
-            </div>
           </div>
+          <div class="hidden" id="options">
+            <div class="row mt-5">
+              <p class="text-start col-7">Select the threadmark catagories that you want in the EPUB file.</p>
+            </div>
+            <div class="row mt-2">
+              <div class="col-2">
+                <label class="switch">
+                    <input type="checkbox" id="acrophyca">
+                    <span class="slider round"></span>
+                </label>
+              </div>
+              <div class="col-4 text-start">
+                <label for="acrophyca" class="form-check-label ms-3">acrophyca</label>
+              </div>
+              <div class="col-2">
+                <label class="switch">
+                    <input type="checkbox" id="sidestory">
+                    <span class="slider round"></span>
+                </label>
+              </div>
+              <div class="col-4 text-start">
+                <label for="sidestory" class="form-check-label ms-3">Sidestory</label>
+              </div>
+            </div>
 
-          <div class="row mt-3">
-            <div class="col-2">
-              <label class="switch">
-                  <input type="checkbox" id="info">
-                  <span class="slider round"></span>
-              </label>
+            <div class="row mt-3">
+              <div class="col-2">
+                <label class="switch">
+                    <input type="checkbox" id="info">
+                    <span class="slider round"></span>
+                </label>
+              </div>
+              <div class="col-4 text-start">
+                <label for="info" class="form-check-label ms-3">Informational</label>
+              </div>
+              
+              <div class="col-2">
+                <label class="switch">
+                    <input type="checkbox" id="media">
+                    <span class="slider round"></span>
+                </label>
+              </div>
+              <div class="col-4 text-start">
+                <label for="media" class="form-check-label ms-3"> Media <small class="">NB: Fetched posts will not have embedded images. </small></label>
+              </div>
             </div>
-            <div class="col-4">
-              <label for="info" class="form-check-label ms-3">Informational</label>
-            </div>
-            
-            <div class="col-2">
-              <label class="switch">
-                  <input type="checkbox" id="media">
-                  <span class="slider round"></span>
-              </label>
-            </div>
-            <div class="col-4">
-              <label for="media" class="form-check-label ms-3"> Media <small class="">NB: Fetched posts will not have embedded images. </small></label>
+
+            <div class="row d-flex align-items-center justify-content-center mt-3">
+              <input type="button" class="col-2 button">
             </div>
           </div>
 
@@ -85,6 +94,39 @@
 // A script that will hide the toggles when there is no URL in thread_url
 
 // A script taht will send off the url packet
+
+export default {
+  data(){
+    return {
+      url: "",
+      url_error_msg:""
+    }
+  },
+  methods: {
+    async detectURL(){
+      let regex = new RegExp('\/threads\/[a-zA-Z0-9-.]+\/')
+      console.log(this.url)
+
+      if ( ! (regex.test(this.url))){
+        this.url_error_msg = "An invalid thread detected."
+        document.getElementById("url_error").classList.remove("hidden")
+        return
+      }
+      else {
+        document.getElementById("url_error").classList.add("hidden")
+        console.log("Here")
+      }
+
+
+      if ( ["forums.spacebattles.com/", "forums.sufficientvelocity.com"].indexOf(new URL(this.url).hostname) > -1)
+      {
+        document.getElementById("options").classList.remove("hidden")
+      }
+
+
+    }
+  }
+}
 
 
 </script>
