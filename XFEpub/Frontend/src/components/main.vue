@@ -20,16 +20,16 @@
             <div class="row mt-2">
               <div class="col-2">
                 <label class="switch">
-                    <input type="checkbox" id="acrophyca">
+                    <input type="checkbox" id="apocrypha"   v-model="apocrypha">
                     <span class="slider round"></span>
                 </label>
               </div>
               <div class="col-4 text-start">
-                <label for="acrophyca" class="form-check-label ms-3">acrophyca</label>
+                <label for="apocrypha" class="form-check-label ms-3">apocrypha</label>
               </div>
               <div class="col-2">
                 <label class="switch">
-                    <input type="checkbox" id="sidestory">
+                    <input type="checkbox" id="sidestory"  v-model="sidestory">
                     <span class="slider round"></span>
                 </label>
               </div>
@@ -41,7 +41,7 @@
             <div class="row mt-3">
               <div class="col-2">
                 <label class="switch">
-                    <input type="checkbox" id="info">
+                    <input type="checkbox" id="info"  v-model="info">
                     <span class="slider round"></span>
                 </label>
               </div>
@@ -51,7 +51,7 @@
               
               <div class="col-2">
                 <label class="switch">
-                    <input type="checkbox" id="media">
+                    <input type="checkbox" id="media"  v-model="media">
                     <span class="slider round"></span>
                 </label>
               </div>
@@ -61,7 +61,7 @@
             </div>
 
             <div class="row d-flex align-items-center justify-content-center mt-3">
-              <input type="button" class="col-2 btn btn-info" value="Request EPUB">
+              <input type="button" class="col-2 btn btn-info" value="Request EPUB" @click="try_submit">
             </div>
           </div>
 
@@ -99,32 +99,50 @@ export default {
   data(){
     return {
       url: "",
-      url_error_msg:""
+      url_error_msg:"",
+      apocrypha:false,
+      sidestory:false,
+      info:false,
+      media:false,
     }
   },
   methods: {
     async detectURL(){
+      
+      if (this.try_url()){
+        document.getElementById("options").classList.remove("hidden")
+      }
+    },
+    async try_submit(){
+
+      if (this.try_url()){
+        console.log(this.info)
+        let body = JSON.stringify({base_url: this.url, apoc: this.apocrypha, sidestory: this.sidestory, info: this.info, media: this.media})
+        
+      }
+    },
+    try_url(){
       let regex = new RegExp('\/threads\/[a-zA-Z0-9-.]+\/')
       console.log(this.url)
+
+      if ( ["forums.spacebattles.com", "forums.sufficientvelocity.com"].indexOf(new URL(this.url).hostname) == -1)
+      {
+        this.url_error_msg = "URL is not from an accepted site."
+        document.getElementById("url_error").classList.remove("hidden")
+        return false
+      }
 
       if ( ! (regex.test(this.url))){
         this.url_error_msg = "An invalid thread detected."
         document.getElementById("url_error").classList.remove("hidden")
-        return
+        return false
       }
       else {
         document.getElementById("url_error").classList.add("hidden")
-        console.log("Here")
       }
-
-
-      if ( ["forums.spacebattles.com/", "forums.sufficientvelocity.com"].indexOf(new URL(this.url).hostname) > -1)
-      {
-        document.getElementById("options").classList.remove("hidden")
-      }
-
-
+      return true
     }
+
   }
 }
 
