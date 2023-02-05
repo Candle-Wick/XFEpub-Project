@@ -61,7 +61,7 @@
             </div>
 
             <div class="row d-flex align-items-center justify-content-center mt-3">
-              <input type="button" class="col-2 button">
+              <input type="button" class="col-2 btn btn-info" value="Request EPUB">
             </div>
           </div>
 
@@ -71,7 +71,7 @@
             <div class="text-start">
             <h1>About</h1>
             <br/>
-            <p >This is a final project focused around giving an user the ability to download a fiction hosted on a XenForo based site. <br/>
+            <p >This is a student project focused around giving an user the ability to download a fiction hosted on a XenForo based site. <br/>
               To use, enter an valid URL into the textbox. A valid URL is a url that belongs to Spacebattles.com or SufficientVelocity.com, that points towards the thread of a story. <br/>
               Example URLs:
               <ul class="list-group">
