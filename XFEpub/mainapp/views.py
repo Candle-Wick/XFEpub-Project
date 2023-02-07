@@ -36,24 +36,26 @@ def check_url(base_url):
     if not re.match('.*\/$', base_url):
         base_url+= '/'
 
-
-    last_slash = base_url.rfind('/', 0, len(base_url)-1)
+    print(base_url)
+    threads = base_url.find('threads/') + 8
+    last_slash = base_url.find('/', threads)
     base_url = base_url[:last_slash]
  
-    return base_url
+    return base_url + '/'
 
-def api_webscrape_call(request: HttpRequest):
+def api_webscrape_call():
 
     
 
     #base_url = 'https://forums.sufficientvelocity.com/threads/warhammer-fantasy-divided-loyalties-an-advisors-quest.44838/reader/'
     #base_url = 'Fail'
     base_url = 'https://forums.sufficientvelocity.com/threads/warhammer-fantasy-divided-loyalties-an-advisors-quest.44838'
-    base_url = 'https://forums.sufficientvelocity.com/threads/from-the-brink-blood-ravens-quest-warhammer-40k.23731/'
+    #base_url = 'https://forums.sufficientvelocity.com/threads/from-the-brink-blood-ravens-quest-warhammer-40k.23731/'
     #base_url = 'https://stackoverflow.com/questions/52157937/python-return-exception-from-function'
 
-    base_url = 'https://forums.spacebattles.com/threads/the-great-caretaker-of-gaia-overlord-si-player.1069790/page-2?post=90021566#post-90021566'
+    #base_url= 'https://forums.spacebattles.com/threads/the-great-caretaker-of-gaia-overlord-si-player.1069790/page-2?post=90021566#post-90021566'
     #base_url= 'https://forums.sufficientvelocity.com/threads/reverse-engineering-is-not-that-easy-planetary-annihilation-multicross-si.108388/5/'
+    #base_url = 'https://forums.sufficientvelocity.com/threads/warhammer-fantasy-divided-loyalties-an-advisors-quest.44838/4/reader/'
     
     try:
         base_url = check_url(base_url)

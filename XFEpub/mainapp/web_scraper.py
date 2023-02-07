@@ -39,7 +39,7 @@ class web_scraper:
         if response.status_code != 200:
             raise Exception
         self.main_page_soup = bs4.BeautifulSoup(response.text, 'html.parser')
-        
+        print (self.base_url+'reader/')
         self.scrape_catagory(self.base_url+'reader/')
 
         if (options):
@@ -92,13 +92,14 @@ class web_scraper:
         self.pack_articles(soup)
 
         pages_to_get = soup.find('ul', class_='pageNav-main')
-        last_page = pages_to_get.find_all('li')[-1]
-        last_page_number = int(last_page.find('a').text)
+        if pages_to_get != None:
+            last_page = pages_to_get.find_all('li')[-1]
+            last_page_number = int(last_page.find('a').text)
 
-        for i in range(2, last_page_number+1):
-            response = requests.get(f'{reader_url}page-{i}', self.headers)
-            self.pack_articles(bs4.BeautifulSoup(response.text, 'html.parser'))
-            time.sleep(self.delay)
+            for i in range(2, last_page_number+1):
+                response = requests.get(f'{reader_url}page-{i}', self.headers)
+                self.pack_articles(bs4.BeautifulSoup(response.text, 'html.parser'))
+                time.sleep(self.delay)
 
 
     def pack_articles(self, soup):
