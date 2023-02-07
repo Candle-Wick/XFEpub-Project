@@ -2,9 +2,11 @@ import requests, bs4, time, os, datetime, zipfile, shutil, re
 from pathlib import Path
 class web_scraper:
 
-    #TODO Rethink entire file storage idea.
+    #NB: Rethink entire file storage idea?
 
     chapter_num = 1
+    # To comply with spacebattles request, this scraper will wait 6 seconds between requests.
+    delay = 6
 
     def __init__(self) -> None:
         self.chapter_num = 1
@@ -37,11 +39,6 @@ class web_scraper:
         if response.status_code != 200:
             raise Exception
         self.main_page_soup = bs4.BeautifulSoup(response.text, 'html.parser')
-
-
-        time.sleep(0.1)
-
-
         
         self.scrape_catagory(self.base_url+'reader/')
 
@@ -49,7 +46,7 @@ class web_scraper:
             for i in range(0,len(options)):
                 # Options contains an array of numbers that represent each threadmark catagory. 
                 self.scrape_catagory(self.base_url+f'{options[i]}/reader/', options[i])
-                self.sleep(0.2)
+                self.sleep(self.delay)
         
 
         # scrape each catagory options says too.
@@ -101,7 +98,7 @@ class web_scraper:
         for i in range(2, last_page_number+1):
             response = requests.get(f'{reader_url}page-{i}', self.headers)
             self.pack_articles(bs4.BeautifulSoup(response.text, 'html.parser'))
-            time.sleep(0.3)
+            time.sleep(self.delay)
 
 
     def pack_articles(self, soup):
