@@ -21,5 +21,6 @@ from mainapp.views import *
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('', mainPage)
+    path('', mainPage),
+    path('api/webscrape_call/', api_webscrape_call)
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

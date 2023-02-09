@@ -3,7 +3,11 @@ import requests, bs4, time, re, os, datetime, zipfile, html, shutil
 from pathlib import Path
 from django.core.validators import URLValidator
 from django.core.exceptions import ValidationError
-from django.http import HttpRequest
+from django.http import HttpResponse
+from django.core.files.base import ContentFile
+
+
+from django.views.decorators.csrf import csrf_exempt
 
 from .web_scraper import *
 # Create your views here.
@@ -43,7 +47,8 @@ def check_url(base_url):
  
     return base_url + '/'
 
-def api_webscrape_call():
+@csrf_exempt
+def api_webscrape_call(request):
 
     
 
@@ -64,5 +69,12 @@ def api_webscrape_call():
         return # TODO Handle exception here
 
     obj = web_scraper()
-    print(obj.webscrape(base_url))
+    file_path = str(obj.webscrape(base_url))
+    # FIXME: File given not valid epub file. The process of downloading it breaks it.
+    #return
+    file = ContentFile(file_path)
+    response = HttpResponse(file, 'application/zip')
+    response['Content-Length'] = file.size
+    response['Content-Disposition'] = f'attachment; filename="{file_path[6:]}"'
+    return response
     #Now, send FIle off to Client to download at leisure.

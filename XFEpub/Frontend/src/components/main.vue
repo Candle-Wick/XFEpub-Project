@@ -66,6 +66,12 @@
           </div>
 
         </form>
+
+        <div class="hidden">
+          <p>constructing EPUB file... </p>
+
+
+        </div>
                      
         <div class="mt-5 d-flex justify-content-center">
             <div class="text-start">
@@ -118,11 +124,24 @@ export default {
       if (this.try_url()){
         console.log(this.info)
         let body = JSON.stringify({base_url: this.url, apoc: this.apocrypha, sidestory: this.sidestory, info: this.info, media: this.media})
+        let requesty = {
+                method: "POST",
+                headers: {
+                    "X-CSRFToken": "",
+                    "Content-Type": "application/zip",
+                    "Accept": "application/zip"
+                },
+                body
+              }
+
         
+        let response = await fetch("http://localhost:8000/api/webscrape_call/", requesty)
+        let data = await response
+        console.log(data)
       }
     },
     try_url(){
-      let regex = new RegExp('\/threads\/[a-zA-Z0-9-.]+\/')
+      let regex = new RegExp('\/threads\/[a-zA-Z0-9-.]+\/?')
       console.log(this.url)
 
       if ( ["forums.spacebattles.com", "forums.sufficientvelocity.com"].indexOf(new URL(this.url).hostname) == -1)
