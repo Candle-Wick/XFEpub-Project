@@ -73,7 +73,7 @@ def api_webscrape_call(request):
     # FIXME: File given not valid epub file. The process of downloading it breaks it.
     #return
     file = ContentFile(file_path)
-    response = HttpResponse(file, 'application/zip')
+    response = HttpResponse(file, 'application/epub+zip')
     response['Content-Length'] = file.size
     response['Content-Disposition'] = f'attachment; filename="{file_path[6:]}"'
     return response

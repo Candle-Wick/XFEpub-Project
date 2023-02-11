@@ -128,8 +128,8 @@ export default {
                 method: "POST",
                 headers: {
                     "X-CSRFToken": "",
-                    "Content-Type": "application/zip",
-                    "Accept": "application/zip"
+                    "Content-Type": "application/epub+zip",
+                    "Accept": "application/epub+zip"
                 },
                 body
               }
