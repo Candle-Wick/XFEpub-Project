@@ -122,7 +122,6 @@ export default {
     async try_submit(){
 
       if (this.try_url()){
-        console.log(this.info)
         let body = JSON.stringify({base_url: this.url, apoc: this.apocrypha, sidestory: this.sidestory, info: this.info, media: this.media})
         let requesty = {
                 method: "POST",
@@ -142,7 +141,7 @@ export default {
     },
     try_url(){
       let regex = new RegExp('\/threads\/[a-zA-Z0-9-.]+\/?')
-      console.log(this.url)
+
 
       if ( ["forums.spacebattles.com", "forums.sufficientvelocity.com"].indexOf(new URL(this.url).hostname) == -1)
       {
