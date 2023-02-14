@@ -83,6 +83,8 @@ class web_scraper:
         '''Scrapes an entire thread for a given catagory'''
         response = requests.get(reader_url, self.headers)
         response.encoding = 'utf-8'
+        if response.status_code != 200:
+            return
         soup = bs4.BeautifulSoup(response.text, 'html.parser')
 
         subheadings = {0:'Threadmarks', 4:'Apocrypha', 3:'Media', 10:'Media', 6:'Informational', 16:'Sidestory', 13:'Apocrypha', 19:'Informational'}
