@@ -67,8 +67,10 @@
 
         </form>
 
-        <div class="hidden">
-          <p>constructing EPUB file... </p>
+        <div class="hidden" id= "Result">
+          <div id = "loading"> 
+          <p>constructing EPUB file... </p> <div class="loader"></div>
+          </div>
 
 
         </div>
@@ -122,6 +124,7 @@ export default {
     async try_submit(){
 
       if (this.try_url()){
+        document.getElementById("Result").classList.remove("hidden")
         let body = JSON.stringify({base_url: this.url, apoc: this.apocrypha, sidestory: this.sidestory, info: this.info, media: this.media})
         let requesty = {
                 method: "POST",
@@ -136,6 +139,10 @@ export default {
         
         let response = await fetch("http://localhost:8000/api/webscrape_call/", requesty)
         let data = await response
+        if (data){
+          //Hide loader once message is recived.
+          document.getElementById("loading").classList.add("hidden")
+        }
         console.log(data)
       }
     },
@@ -232,6 +239,21 @@ input:checked + .slider:before {
 
 .slider.round:before {
   border-radius: 50%;
+}
+
+/* w3 Loader*/
+.loader {
+  border: 16px solid #f3f3f3; /* Light grey */
+  border-top: 16px solid #3498db; /* Blue */
+  border-radius: 50%;
+  width: 120px;
+  height: 120px;
+  animation: spin 2s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
 }
 
 </style>

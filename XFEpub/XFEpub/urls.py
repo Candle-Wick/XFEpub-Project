@@ -18,9 +18,12 @@ from django.urls import path, include
 from django.conf import settings
 from django.conf.urls.static import static
 from mainapp.views import *
+from Epubs.urls import *
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', mainPage),
-    path('api/webscrape_call/', api_webscrape_call)
+    path('api/webscrape_call/', api_webscrape_call),
+    path('epub/', Epubs.urls)
+
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
