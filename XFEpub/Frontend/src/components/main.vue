@@ -136,7 +136,7 @@ export default {
                     "Content-Type": "application/epub+zip",
                     "Accept": "application/epub+zip"
                 },
-                body
+                body: body
               }
 
         

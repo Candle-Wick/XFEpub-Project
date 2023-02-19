@@ -5,7 +5,7 @@ from django.core.validators import URLValidator
 from django.core.exceptions import ValidationError
 from django.http import HttpResponse
 from django.core.files.base import ContentFile
-
+from json import loads
 
 from django.views.decorators.csrf import csrf_exempt
 
@@ -50,7 +50,9 @@ def check_url(base_url):
 @csrf_exempt
 def api_webscrape_call(request):
 
-    
+    request_body = loads(request.body.decode("utf-8"))
+    base_url = request_body['base_url']
+
 
     #base_url = 'https://forums.sufficientvelocity.com/threads/warhammer-fantasy-divided-loyalties-an-advisors-quest.44838/reader/'
     #base_url = 'Fail'
@@ -68,9 +70,39 @@ def api_webscrape_call(request):
         print(f'invalid! {base_url} {err}' )
         return # TODO Handle exception here
 
+    
+    #subheadings = {4:'Apocrypha', 3:'Media', 10:'Media', 6:'Informational', 16:'Sidestory', 13:'Apocrypha', 19:'Informational'}
+    # Each 'catagory', subset of the threadmarked posts, can be found with the format '{thread_url}/{number}/reader'
+    # Exception is threadmarks, the main subset. 
+    # The numbers corespond to each catagory as such:
+
+    # Site: Spacebattles | Sufficient velocity
+    # Sidestory:      16 |                  5
+    # Apocyrpha       13 |                  4
+    # Media:          10 |                  3
+    # Informational:  19 |                  6
+
+    if 'spacebattles' in base_url:
+        catagories = [ 16, 13, 10, 19]
+    else:
+        catagories = [ 5, 4, 3, 6]
+
+    options = []
+    if request_body["sidestory"]:
+        options.append(catagories[0])
+    if request_body["apoc"]:
+        options.append(catagories[1])
+    if request_body["media"]:
+        options.append(catagories[2])
+    if request_body["info"]:
+        options.append(catagories[3])
+
+    #TODO Test options; test return
     obj = web_scraper()
-    file_path = str(obj.webscrape(base_url))
-    # FIXME: File given not valid epub file. The process of downloading it breaks it.
+    file_path = str(obj.webscrape(base_url, options))
+
+    return HttpResponse(content=file_path)
+
     #return
     #file = ContentFile(file_path)
     with open(file_path, 'rb') as f:
