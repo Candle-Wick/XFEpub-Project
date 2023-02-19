@@ -68,8 +68,11 @@
         </form>
 
         <div class="hidden" id= "Result">
-          <div id = "loading"> 
-          <p>constructing EPUB file... </p> <div class="loader"></div>
+          <div id = "loading" class="d-flex justify-content-center align-items-center mt-2"> 
+            <p class="text-center m-0 me-2">
+              Constructing EPUB file...
+            </p>
+            <div class="loader align-middle"></div>
           </div>
 
 
@@ -243,12 +246,14 @@ input:checked + .slider:before {
 
 /* w3 Loader*/
 .loader {
-  border: 16px solid #f3f3f3; /* Light grey */
-  border-top: 16px solid #3498db; /* Blue */
+  border: 7px solid #f3f3f3; /* Light grey */
+  border-top: 7px solid #000000; /* Blue */
   border-radius: 50%;
-  width: 120px;
-  height: 120px;
-  animation: spin 2s linear infinite;
+  width: 40px;
+  height: 40px;
+  max-width: 40px;
+  max-height: 40px;
+  animation: spin 1s linear infinite;
 }
 
 @keyframes spin {

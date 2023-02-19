@@ -1,9 +1,9 @@
 <?xml version='1.0' encoding='utf-8'?>
 <package xmlns="http://www.idpf.org/2007/opf" unique-identifier="id" version="3.0" prefix="rendition: http://www.idpf.org/vocab/rendition/#">
   <metadata xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:opf="http://www.idpf.org/2007/opf">
-    <meta property="dcterms:modified">2023-02-14T15:11:56Z</meta>
+    <meta property="dcterms:modified">2023-02-19T12:06:34Z</meta>
     <meta name="generator" content="Ebook-lib 0.17.1"/>
-    <dc:identifier id="id">-1579893527102275795</dc:identifier>
+    <dc:identifier id="id">-3552027087641489766</dc:identifier>
     <dc:title>Warhammer Fantasy: Divided Loyalties - an Advisor's Quest</dc:title>
     <dc:language>en</dc:language>
     <dc:creator id="creator">Boney</dc:creator>
