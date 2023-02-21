@@ -92,7 +92,6 @@ class web_scraper:
 
 
         self.pack_articles(soup)
-        return
         pages_to_get = soup.find('ul', class_='pageNav-main')
         if pages_to_get != None:
             last_page = pages_to_get.find_all('li')[-1]

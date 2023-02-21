@@ -147,6 +147,7 @@ export default {
           document.getElementById("loading").classList.add("hidden")
         }
         console.log(data)
+        // window.location.href = "http";
       }
     },
     try_url(){

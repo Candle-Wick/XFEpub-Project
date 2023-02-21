@@ -9,6 +9,7 @@ from json import loads
 
 from django.views.decorators.csrf import csrf_exempt
 
+from django.conf import settings
 from .web_scraper import *
 # Create your views here.
 
@@ -52,18 +53,7 @@ def api_webscrape_call(request):
 
     request_body = loads(request.body.decode("utf-8"))
     base_url = request_body['base_url']
-
-
-    #base_url = 'https://forums.sufficientvelocity.com/threads/warhammer-fantasy-divided-loyalties-an-advisors-quest.44838/reader/'
-    #base_url = 'Fail'
-    base_url = 'https://forums.sufficientvelocity.com/threads/warhammer-fantasy-divided-loyalties-an-advisors-quest.44838'
-    #base_url = 'https://forums.sufficientvelocity.com/threads/from-the-brink-blood-ravens-quest-warhammer-40k.23731/'
-    #base_url = 'https://stackoverflow.com/questions/52157937/python-return-exception-from-function'
-
-    #base_url= 'https://forums.spacebattles.com/threads/the-great-caretaker-of-gaia-overlord-si-player.1069790/page-2?post=90021566#post-90021566'
-    #base_url= 'https://forums.sufficientvelocity.com/threads/reverse-engineering-is-not-that-easy-planetary-annihilation-multicross-si.108388/5/'
-    #base_url = 'https://forums.sufficientvelocity.com/threads/warhammer-fantasy-divided-loyalties-an-advisors-quest.44838/4/reader/'
-    
+  
     try:
         base_url = check_url(base_url)
     except Exception as err:
@@ -100,8 +90,8 @@ def api_webscrape_call(request):
     #TODO Test options; test return
     obj = web_scraper()
     file_path = str(obj.webscrape(base_url, options))
-
-    return HttpResponse(content=file_path)
+    #Note: Remember that webscraper now grabs entire thread, not just first page.
+    return HttpResponse(content=f'{settings.SITE_URL}{file_path}')
 
     #return
     #file = ContentFile(file_path)
