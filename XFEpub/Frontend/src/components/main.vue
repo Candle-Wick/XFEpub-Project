@@ -74,9 +74,11 @@
             </p>
             <div class="loader align-middle"></div>
           </div>
+          
 
 
         </div>
+        <p class="hidden mt-2 text-danger" id="response_error">{{ this.response_error_msg }}</p>
                      
         <div class="mt-5 d-flex justify-content-center">
             <div class="text-start">
@@ -111,6 +113,7 @@ export default {
     return {
       url: "",
       url_error_msg:"",
+      response_error_msg:"",
       apocrypha:false,
       sidestory:false,
       info:false,
@@ -128,6 +131,7 @@ export default {
 
       if (this.try_url()){
         document.getElementById("Result").classList.remove("hidden")
+        document.getElementById("response_error").classList.add("hidden")
         let body = JSON.stringify({base_url: this.url, apoc: this.apocrypha, sidestory: this.sidestory, info: this.info, media: this.media})
         let requesty = {
                 method: "POST",
@@ -141,13 +145,21 @@ export default {
 
         
         let response = await fetch("http://localhost:8000/api/webscrape_call/", requesty)
-        let data = await response
+        let data = await response.text()
         if (data){
           //Hide loader once message is recived.
-          document.getElementById("loading").classList.add("hidden")
+          document.getElementById("Result").classList.add("hidden")
         }
-        console.log(data)
-        // window.location.href = "http";
+        if (response.status==200){
+          window.location.href = data;
+        }
+        else if (response.status==500)
+        {
+          this.response_error_msg = data
+          document.getElementById("Result").classList.add("hidden")
+          document.getElementById("response_error").classList.remove("hidden")
+        }
+
       }
     },
     try_url(){

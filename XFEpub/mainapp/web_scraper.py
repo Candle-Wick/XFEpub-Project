@@ -39,14 +39,13 @@ class web_scraper:
         if response.status_code != 200:
             raise Exception
         self.main_page_soup = bs4.BeautifulSoup(response.text, 'html.parser')
-        print (self.base_url+'reader/')
         self.scrape_catagory(self.base_url+'reader/')
 
         if (options):
             for i in range(0,len(options)):
                 # Options contains an array of numbers that represent each threadmark catagory. 
                 self.scrape_catagory(self.base_url+f'{options[i]}/reader/', options[i])
-                self.sleep(self.delay)
+                time.sleep(self.delay)
         
 
         # scrape each catagory options says too.

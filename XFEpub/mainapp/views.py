@@ -16,7 +16,11 @@ from .web_scraper import *
 def mainPage(request):
     return render(request, "index.html", {})
 
+class BadRequestException(Exception):
 
+    def __init__(self, error_type: str, *args: object) -> None:
+        self.error_type = error_type 
+        super().__init__(*args)
 
 def check_url(base_url):
     '''Checks if given URL is of right domain and if actual thread'''
@@ -24,8 +28,7 @@ def check_url(base_url):
     try:
         val(base_url)
     except ValidationError:
-        print("Not valid Url")
-        raise 
+        raise BadRequestException("Not a valid Url")
 
     can_continue = False
     accepted_urls = ['spacebattles.com/threads/','sufficientvelocity.com/threads/']
@@ -34,14 +37,12 @@ def check_url(base_url):
             can_continue = True
 
     if not can_continue:
-        print("Domain not accepted")
-        raise
+        raise BadRequestException("Domain not accepted.")
 
     #To keep this consistant.
     if not re.match('.*\/$', base_url):
         base_url+= '/'
 
-    print(base_url)
     threads = base_url.find('threads/') + 8
     last_slash = base_url.find('/', threads)
     base_url = base_url[:last_slash]
@@ -56,8 +57,10 @@ def api_webscrape_call(request):
   
     try:
         base_url = check_url(base_url)
-    except Exception as err:
+    except BadRequestException as err:
         print(f'invalid! {base_url} {err}' )
+        bad_response = HttpResponse(status=500, content=err.error_type)
+        return bad_response
         return # TODO Handle exception here
 
     
@@ -93,12 +96,3 @@ def api_webscrape_call(request):
     #Note: Remember that webscraper now grabs entire thread, not just first page.
     return HttpResponse(content=f'{settings.SITE_URL}{file_path}')
 
-    #return
-    #file = ContentFile(file_path)
-    with open(file_path, 'rb') as f:
-        file = f.read()
-    response = HttpResponse(file, 'application/epub+zip')
-    #response['Content-Length'] = file.size
-    response['Content-Disposition'] = f'attachment; filename="{file_path[6:]}"'
-    return response
-    #Now, send FIle off to Client to download at leisure.
