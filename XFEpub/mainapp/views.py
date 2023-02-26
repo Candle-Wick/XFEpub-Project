@@ -90,7 +90,6 @@ def api_webscrape_call(request):
     if request_body["info"]:
         options.append(catagories[3])
 
-    #TODO Test options; test return
     obj = web_scraper()
     file_path = str(obj.webscrape(base_url, options))
     #Note: Remember that webscraper now grabs entire thread, not just first page.
