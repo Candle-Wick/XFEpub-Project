@@ -7,6 +7,7 @@
 
 
         <form action="" class="container" v-on:submit.prevent="detectURL">
+          <input type="hidden" name="_token" :value="csrf">
           <div class="row">
             <label for="thread_url" class="form-label">Choose a thread to download:</label>
             <input type="url" id="thread_url" name="thread_url" class="form-control" style="font-size: 1.4em;" v-model="url" @keyup.enter="">
@@ -118,6 +119,7 @@ export default {
       sidestory:false,
       info:false,
       media:false,
+      csrf: document.querySelector('meta[name="csrf-token"]').getAttribute('content'), 
     }
   },
   methods: {

@@ -25,6 +25,4 @@ urlpatterns = [
     path('', mainPage),
     path('api/webscrape_call/', api_webscrape_call),
     path('Epubs/<str:epub_path>', epub_view)
-
-
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
