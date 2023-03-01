@@ -23,7 +23,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-39*51b)ad5x4dxbu@vc(7om@47pqdxuvjy3x+emz^+4q_!8-fg'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
 
 if DEBUG:
@@ -31,10 +31,10 @@ if DEBUG:
     mimetypes.add_type("application/javascript", ".js", True)
     SITE_URL = "http://127.0.0.1:8000/"
 else:
-    SITE_URL = ""
+    SITE_URL = "https://XFEpub-web-apps-Candle-Wick.apps.d.comp-teach.qmul.ac.uk/"
     
-ALLOWED_HOSTS = ["https://console.d.comp-teach.qmul.ac.uk/"]
-CSRF_TRUSTED_ORIGINS = ['https://*.mydomain.com','http://127.0.0.1:8000/']
+ALLOWED_HOSTS = ["https://XFEpub-web-apps-Candle-Wick.apps.d.comp-teach.qmul.ac.uk/"]
+CSRF_TRUSTED_ORIGINS = ["https://XFEpub-web-apps-Candle-Wick.apps.d.comp-teach.qmul.ac.uk/",'http://127.0.0.1:8000/']
 
 # Application definition
 
