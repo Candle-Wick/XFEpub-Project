@@ -11,16 +11,13 @@ from django.views.decorators.csrf import csrf_exempt
 
 from django.conf import settings
 from .web_scraper import *
+from mainapp.error import BadRequestException
 # Create your views here.
 
 def mainPage(request):
     return render(request, "index.html", {})
 
-class BadRequestException(Exception):
 
-    def __init__(self, error_type: str, *args: object) -> None:
-        self.error_type = error_type 
-        super().__init__(*args)
 
 def check_url(base_url):
     '''Checks if given URL is of right domain and if actual thread'''
@@ -46,25 +43,20 @@ def check_url(base_url):
     threads = base_url.find('threads/') + 8
     last_slash = base_url.find('/', threads)
     base_url = base_url[:last_slash]
- 
+
     return base_url + '/'
 
 @csrf_exempt
 def api_webscrape_call(request):
-
     request_body = loads(request.body.decode("utf-8"))
     base_url = request_body['base_url']
-  
     try:
         base_url = check_url(base_url)
     except BadRequestException as err:
         print(f'invalid! {base_url} {err}' )
         bad_response = HttpResponse(status=500, content=err.error_type)
         return bad_response
-        return # TODO Handle exception here
 
-    
-    #subheadings = {4:'Apocrypha', 3:'Media', 10:'Media', 6:'Informational', 16:'Sidestory', 13:'Apocrypha', 19:'Informational'}
     # Each 'catagory', subset of the threadmarked posts, can be found with the format '{thread_url}/{number}/reader'
     # Exception is threadmarks, the main subset. 
     # The numbers corespond to each catagory as such:
@@ -91,7 +83,11 @@ def api_webscrape_call(request):
         options.append(catagories[3])
 
     obj = web_scraper()
-    file_path = str(obj.webscrape(base_url, options))
-    #Note: Remember that webscraper now grabs entire thread, not just first page.
+    try:
+        file_path = str(obj.webscrape(base_url, options))
+    except BadRequestException as err:
+        print(f'invalid! {base_url} {err}' )
+        bad_response = HttpResponse(status=500, content=err.error_type)
+        return bad_response
     return HttpResponse(content=f'{settings.SITE_URL}{file_path}')
 

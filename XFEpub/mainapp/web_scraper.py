@@ -1,9 +1,8 @@
 import requests, bs4, time, os, datetime, zipfile, shutil, re
 from pathlib import Path
+from mainapp.error import BadRequestException
+
 class web_scraper:
-
-    #NB: Rethink entire file storage idea?
-
     chapter_num = 1
     # To comply with spacebattles request, this scraper will wait 6 seconds between requests.
     delay = 6
@@ -26,18 +25,13 @@ class web_scraper:
         'Access-Control-Max-Age': '3600',
         'User-Agent': 'Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:52.0) Gecko/20100101 Firefox/52.0'
         }
-        # Fetch from user
 
-        #Test without scraping
-        # soup = None
-        # with open('res.txt', 'r') as f:
-        #     soup = bs4.BeautifulSoup(f, 'html.parser')
         self.base_url = base_url
 
         response = requests.get(base_url, self.headers)
         response.encoding = 'utf-8'
         if response.status_code != 200:
-            raise Exception
+            raise BadRequestException("Not a valid thread.")
         self.main_page_soup = bs4.BeautifulSoup(response.text, 'html.parser')
         self.scrape_catagory(self.base_url+'reader/')
 
@@ -47,36 +41,11 @@ class web_scraper:
                 self.scrape_catagory(self.base_url+f'{options[i]}/reader/', options[i])
                 time.sleep(self.delay)
         
-
         # scrape each catagory options says too.
-
-
         self.start_boilerplate()
         self.close_boilerplate()
 
         return self.zip_up()
-
-        # Calculates how many pages need to be fetched.
-        
-
-        #Step 2.1, update package document, manifest, spine
-        # Adding all tge files and folder boilerstuff
-        '''
-            mimetype
-            META-INT
-            > container.xml
-            EPUB
-            > content.opf
-            > introduction.xhtml
-            > nav.xhtml
-            > toc.ncx
-            style
-                > main.css
-                > nav.css
-        
-        '''
-
-        # finish boilerstuff
 
     def scrape_catagory(self, reader_url, catagory=0):
         '''Scrapes an entire thread for a given catagory'''
@@ -88,7 +57,6 @@ class web_scraper:
 
         subheadings = {0:'Threadmarks', 4:'Apocrypha', 3:'Media', 10:'Media', 6:'Informational', 16:'Sidestory', 13:'Apocrypha', 19:'Informational', 5:"Sidestory"}
         self.nav_list += f'\n        <li>\n          <h3>{subheadings[catagory]}</h3>\n        </li>'
-
 
         self.pack_articles(soup)
         pages_to_get = soup.find('ul', class_='pageNav-main')
@@ -107,9 +75,7 @@ class web_scraper:
         page_message_chain = soup.find('div', class_='block--messages')
         articles = page_message_chain.find_all('article', class_='message--post')
         for i in range(len(articles)):
-            # Step 3. Converting each post, articles[i], into an chapter file, format.
-            #The chapters title, <span class='threadmarkLabel'> articles[i].find('span', class_='threadmarkLabel')
-            ##The chapter text
+
             chapter_title = articles[i].find("span",class_="threadmarkLabel").get_text(strip=True)
             with open(f'ToZip/EPUB/Chapter-{self.chapter_num}.xhtml', 'w', encoding='utf8') as f:
                 f.write(f'<?xml version=\'1.0\' encoding=\'utf-8\'?>\n<!DOCTYPE html>\n<html xmlns="http://www.w3.org/1999/xhtml" xmlns:epub="http://www.idpf.org/2007/ops" epub:prefix="z3998: http://www.daisy.org/z3998/2012/vocab/structure/#" lang="en" xml:lang="en">\n  <head>\n    <title>{chapter_title}</title>\n    <link href="style/main.css" rel="stylesheet" type="text/css"/>\n  </head>\n  <body>\n    <h2>{chapter_title}</h2>\n')
@@ -146,15 +112,12 @@ class web_scraper:
             for file_path in ToZip_META.iterdir():
                 zip.write(file_path, 'META-INF/'+file_path.name.removesuffix('ToZip/'))
 
-        
-
         epub_path = Path(f'Epubs/{thread_title}.zip')
 
         if (os.path.exists(epub_path.with_suffix('.epub'))):
             os.remove(epub_path.with_suffix('.epub'))
 
         epub_path.rename(epub_path.with_suffix('.epub'))
-
 
         return epub_path.with_suffix('.epub')
 
@@ -205,8 +168,6 @@ class web_scraper:
             f.write(f'      <ol>\n        <li>\n          <a href="introduction.xhtml">Introduction</a>\n        </li>')
             f.write(self.nav_list)
 
-            
-
         with open('ToZip/EPUB/toc.ncx', 'w', encoding='utf8') as f:
             f.write(f'<?xml version=\'1.0\' encoding=\'utf-8\'?>\n<ncx xmlns="http://www.daisy.org/z3986/2005/ncx/" version="2005-1">\n  <head>\n    <meta content="{identifier}" name="dtb:uid"/>\n    <meta content="0" name="dtb:depth"/>\n    <meta content="0" name="dtb:totalPageCount"/>\n    <meta content="0" name="dtb:maxPageNumber"/>\n  </head>\n  <docTitle>\n    <text>{thread_title.get_text(strip=True)}</text>\n  </docTitle>\n  <navMap>')
             f.write(f'    <navPoint id="intro" playOrder="1">\n     <navLabel>\n       <text>Introduction</text>\n     </navLabel>\n     <content src="introduction.xhtml"/>\n   </navPoint>')
@@ -219,7 +180,6 @@ class web_scraper:
         with open('ToZip/EPUB/style/nav.css', 'w', encoding='utf8') as f:
             f.write('BODY {color: white;}')        
 
-
         with open('ToZip/mimetype', 'w', encoding='utf8') as f:
             f.write('application/epub+zip')
 
@@ -229,8 +189,6 @@ class web_scraper:
 
     def close_boilerplate(self):
         '''Appends to content.opf, introduction.xhtml, nav and toc the closing tags'''
-
-
         with open('ToZip/EPUB/introduction.xhtml', 'a', encoding='utf8') as f:
             f.write('\n  </body>\n</html>')
 
