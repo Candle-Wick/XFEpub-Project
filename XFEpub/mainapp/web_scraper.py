@@ -41,7 +41,6 @@ class web_scraper:
                 self.scrape_catagory(self.base_url+f'{options[i]}/reader/', options[i])
                 time.sleep(self.delay)
         
-        # scrape each catagory options says too.
         self.start_boilerplate()
         self.close_boilerplate()
 

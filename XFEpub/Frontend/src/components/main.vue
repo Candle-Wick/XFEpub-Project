@@ -75,8 +75,6 @@
             <div class="loader align-middle"></div>
           </div>
           
-
-
         </div>
         <p class="hidden mt-2 text-danger" id="response_error">{{ this.response_error_msg }}</p>
                      
@@ -92,8 +90,7 @@
                 <li class="list-group-item">https://forums.sufficientvelocity.com/threads/hybrid-hive-eat-shard-worm-mgln.55056/</li>
                 <li class="list-group-item">https://forums.sufficientvelocity.com/threads/reverse-engineering-is-not-that-easy-planetary-annihilation-multicross-si.108388/</li>
               </ul>
-
-              <!-- Something about choosing wich parts to grab. -->
+              <p>Once a valid URL has been entered, use the checkboxes generated to decide which parts of the thread associated with the URL you wish to include in the EPUB file. All EPUB files generated from this site will have the catagory 'threadmark', as that is considered the main parts of the story within the thread. However, by selecting one or more of the optional catagories, posts marked under those catagories will also be included in the EPUB file, if present.</p>
             </p>
             </div>
           </div>
@@ -104,9 +101,6 @@
 </template>
 
 <script>
-// A script that will hide the toggles when there is no URL in thread_url
-
-// A script taht will send off the url packet
 
 export default {
   data(){
