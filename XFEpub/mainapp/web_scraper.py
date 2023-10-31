@@ -76,7 +76,7 @@ class web_scraper:
         for i in range(len(articles)):
 
             chapter_title = articles[i].find("span",class_="threadmarkLabel").get_text(strip=True)
-            with open(f'ToZip/EPUB/Chapter-{self.chapter_num}.xhtml', 'w', encoding='utf8') as f:
+            with open(f'XFEPub/ToZip/EPUB/Chapter-{self.chapter_num}.xhtml', 'w', encoding='utf8') as f:
                 f.write(f'<?xml version=\'1.0\' encoding=\'utf-8\'?>\n<!DOCTYPE html>\n<html xmlns="http://www.w3.org/1999/xhtml" xmlns:epub="http://www.idpf.org/2007/ops" epub:prefix="z3998: http://www.daisy.org/z3998/2012/vocab/structure/#" lang="en" xml:lang="en">\n  <head>\n    <title>{chapter_title}</title>\n    <link href="style/main.css" rel="stylesheet" type="text/css"/>\n  </head>\n  <body>\n    <h2>{chapter_title}</h2>\n')
                 text_body = articles[i].find('div', class_='bbWrapper')
                 f.write(str(text_body) )
@@ -96,13 +96,13 @@ class web_scraper:
         thread_title = " ".join(thread_title.split()).replace(" ", "_")
         thread_title = "".join([c for c in thread_title if re.match(r'\w', c)])
 
-        ToZip_EPUB = Path('ToZip/EPUB')
-        ToZip_META = Path('ToZip/META-INF')
-        ToZip_Style = Path('ToZip/EPUB/style')
+        ToZip_EPUB = Path('XFEPub/ToZip/EPUB')
+        ToZip_META = Path('XFEPub/ToZip/META-INF')
+        ToZip_Style = Path('XFEPub/ToZip/EPUB/style')
 
-        with zipfile.ZipFile(f'Epubs/{thread_title}.zip', 'w') as zip:
-            zip.write('ToZip/mimetype', 'mimetype')
-        with zipfile.ZipFile(f'Epubs/{thread_title}.zip', 'a', compression=zipfile.ZIP_DEFLATED) as zip:
+        with zipfile.ZipFile(f'XFEPub/Epubs/{thread_title}.zip', 'w') as zip:
+            zip.write('XFEPub/ToZip/mimetype', 'mimetype')
+        with zipfile.ZipFile(f'XFEPub/Epubs/{thread_title}.zip', 'a', compression=zipfile.ZIP_DEFLATED) as zip:
 
             for file_path in ToZip_EPUB.iterdir():
                 zip.write(file_path, 'EPUB/'+file_path.name.removesuffix('ToZip/'))
@@ -111,7 +111,7 @@ class web_scraper:
             for file_path in ToZip_META.iterdir():
                 zip.write(file_path, 'META-INF/'+file_path.name.removesuffix('ToZip/'))
 
-        epub_path = Path(f'Epubs/{thread_title}.zip')
+        epub_path = Path(f'XFEPub/Epubs/{thread_title}.zip')
 
         if (os.path.exists(epub_path.with_suffix('.epub'))):
             os.remove(epub_path.with_suffix('.epub'))
@@ -134,7 +134,7 @@ class web_scraper:
         #Given that there is no UUID, DOI or ISBN typically associated with the content scraped. A hash is instead generated for a identifier that will likely be unique.
         identifier = hash(thread_title.get_text()+creator+datetime_now)
 
-        with open('ToZip/EPUB/introduction.xhtml', 'w', encoding='utf8') as f:
+        with open('XFEPub/ToZip/EPUB/introduction.xhtml', 'w', encoding='utf8') as f:
             f.write('<?xml version=\'1.0\' encoding="utf-8"?>\n<!DOCTYPE html>\n<html xmlns="http://www.w3.org/1999/xhtml" xmlns:epub="http://www.idpf.org/2007/ops" epub:prefix="z3998: http://www.daisy.org/z3998/2012/vocab/structure/#" lang="en" xml:lang="en">')
             f.write(f'\n  <head>\n    <title>{ thread_title.get_text(strip=True) }</title>\n  </head>\n<body>')
             f.write(f"""
@@ -156,70 +156,70 @@ class web_scraper:
 	<p>Exported by: <a href="{1}">XFReader</a></p>""")
             #TODO, Add in the url to the site here.
 
-        with open('ToZip/EPUB/content.opf', 'w', encoding='utf8') as f:
+        with open('XFEPub/ToZip/EPUB/content.opf', 'w', encoding='utf8') as f:
             f.write(f'<?xml version=\'1.0\' encoding=\'utf-8\'?>\n<package xmlns="http://www.idpf.org/2007/opf" unique-identifier="id" version="3.0" prefix="rendition: http://www.idpf.org/vocab/rendition/#">')
             f.write(f'\n  <metadata xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:opf="http://www.idpf.org/2007/opf">\n    <meta property="dcterms:modified">{datetime_now}</meta>\n    <meta name="generator" content="Ebook-lib 0.17.1"/>')
             f.write(f'\n    <dc:identifier id="id">{identifier}</dc:identifier>\n    <dc:title>{thread_title.get_text(strip=True) }</dc:title>\n    <dc:language>en</dc:language>\n    <dc:creator id="creator">{creator}</dc:creator>\n    <dc:description>{thread_description.get_text(strip=True)}</dc:description>\n  </metadata>')
             f.write(f'\n  <manifest>\n    <item href="style/main.css" id="doc_style" media-type="text/css"/>\n    <item href="style/nav.css" id="style_nav" media-type="text/css"/>\n    <item href="introduction.xhtml" id="chapter_0" media-type="application/xhtml+xml"/>\n    <item href="nav.xhtml" id="nav" media-type="application/xhtml+xml" properties="nav"/>')
 
-        with open('ToZip/EPUB/nav.xhtml', 'w', encoding='utf8') as f:
+        with open('XFEPub/ToZip/EPUB/nav.xhtml', 'w', encoding='utf8') as f:
             f.write(f'<?xml version=\'1.0\' encoding=\'utf-8\'?>\n<!DOCTYPE html>\n<html xmlns="http://www.w3.org/1999/xhtml" xmlns:epub="http://www.idpf.org/2007/ops" lang="en" xml:lang="en">\n  <head>\n    <title>{thread_title.get_text(strip=True) }</title>\n    <link href="style/main.css" rel="stylesheet" type="text/css"/>\n  </head>\n  <body>\n    <nav epub:type="toc" id="id" role="doc-toc">\n      <h2>{thread_title.get_text(strip=True) }</h2>\n')
             f.write(f'      <ol>\n        <li>\n          <a href="introduction.xhtml">Introduction</a>\n        </li>')
             f.write(self.nav_list)
 
-        with open('ToZip/EPUB/toc.ncx', 'w', encoding='utf8') as f:
+        with open('XFEPub/ToZip/EPUB/toc.ncx', 'w', encoding='utf8') as f:
             f.write(f'<?xml version=\'1.0\' encoding=\'utf-8\'?>\n<ncx xmlns="http://www.daisy.org/z3986/2005/ncx/" version="2005-1">\n  <head>\n    <meta content="{identifier}" name="dtb:uid"/>\n    <meta content="0" name="dtb:depth"/>\n    <meta content="0" name="dtb:totalPageCount"/>\n    <meta content="0" name="dtb:maxPageNumber"/>\n  </head>\n  <docTitle>\n    <text>{thread_title.get_text(strip=True)}</text>\n  </docTitle>\n  <navMap>')
             f.write(f'    <navPoint id="intro" playOrder="1">\n     <navLabel>\n       <text>Introduction</text>\n     </navLabel>\n     <content src="introduction.xhtml"/>\n   </navPoint>')
             f.write(self.toc_list)
 
         # The defaullt boilerplate, requires nothing from what is fetched.
-        with open('ToZip/EPUB/style/main.css', 'w', encoding='utf8') as f:
+        with open('XFEPub/ToZip/EPUB/style/main.css', 'w', encoding='utf8') as f:
             f.write('@namespace epub "http://www.idpf.org/2007/ops";\nbody {\n    font-family: Verdana, Helvetica, Arial, sans-serif;\n}\nh1 {\n    text-align: center;\n}\nh2 {\n    text-align: left;\n    font-weight: bold;\n}\nol {\n    list-style-type: none;\n    margin: 0;\n}\nol > li {\n    margin-top: 0.3em;\n}\nol > li > span {\n    font-weight: bold;\n}\nol > li > ol {\n    margin-left: 0.5em;\n}\n.spoiler {\n    padding-left: 0.4em;\n    border-left: 0.2em solid #c7ccd1;\n}\n')
         
-        with open('ToZip/EPUB/style/nav.css', 'w', encoding='utf8') as f:
+        with open('XFEPub/ToZip/EPUB/style/nav.css', 'w', encoding='utf8') as f:
             f.write('BODY {color: white;}')        
 
-        with open('ToZip/mimetype', 'w', encoding='utf8') as f:
+        with open('XFEPub/ToZip/mimetype', 'w', encoding='utf8') as f:
             f.write('application/epub+zip')
 
-        with open('ToZip/META-INF/container.xml', 'w', encoding='utf8') as f:
+        with open('XFEPub/ToZip/META-INF/container.xml', 'w', encoding='utf8') as f:
             f.write('<?xml version=\'1.0\' encoding=\'utf-8\'?>\n<container xmlns="urn:oasis:names:tc:opendocument:xmlns:container" version="1.0">\n  <rootfiles>\n    <rootfile media-type="application/oebps-package+xml" full-path="EPUB/content.opf"/>\n  </rootfiles>\n</container>')
 
 
     def close_boilerplate(self):
         '''Appends to content.opf, introduction.xhtml, nav and toc the closing tags'''
-        with open('ToZip/EPUB/introduction.xhtml', 'a', encoding='utf8') as f:
+        with open('XFEPub/ToZip/EPUB/introduction.xhtml', 'a', encoding='utf8') as f:
             f.write('\n  </body>\n</html>')
 
-        with open('ToZip/EPUB/content.opf', 'a', encoding='utf8') as f:
+        with open('XFEPub/ToZip/EPUB/content.opf', 'a', encoding='utf8') as f:
             f.write(self.manifest)
             f.write('    <item href="toc.ncx" id="ncx" media-type="application/x-dtbncx+xml"/>\n  </manifest>\n  <spine toc="ncx">')
             f.write(self.spine)
             f.write('  </spine>\n</package>')   
 
-        with open('ToZip/EPUB/nav.xhtml', 'a', encoding='utf8') as f:
+        with open('XFEPub/ToZip/EPUB/nav.xhtml', 'a', encoding='utf8') as f:
             f.write('\n      </ol>\n    </nav>\n  </body>\n</html>')
 
-        with open('ToZip/EPUB/toc.ncx', 'a', encoding='utf8') as f:
+        with open('XFEPub/ToZip/EPUB/toc.ncx', 'a', encoding='utf8') as f:
             f.write('\n  </navMap>\n</ncx>')
 
     def clear_ToZip(self):
         '''Empties ToZip of the last EPUB checked.'''
-        dir = 'ToZip/EPUB'
-        if (os.path.exists('ToZip/EPUB/')):
+        dir = 'XFEPub/ToZip/EPUB'
+        if (os.path.exists('XFEPub/ToZip/EPUB/')):
             shutil.rmtree(dir)
         
-        if (not os.path.exists('ToZip/')):
-            os.makedirs('ToZip/')
+        if (not os.path.exists('XFEPub/ToZip/')):
+            os.makedirs('XFEPub/ToZip/')
 
-        if (not os.path.exists('ToZip/EPUB/')):
-            os.makedirs('ToZip/EPUB/')
+        if (not os.path.exists('XFEPub/ToZip/EPUB/')):
+            os.makedirs('XFEPub/ToZip/EPUB/')
 
-        if (not os.path.exists('ToZip/EPUB/style')):
-            os.makedirs('ToZip/EPUB/style')
+        if (not os.path.exists('XFEPub/ToZip/EPUB/style')):
+            os.makedirs('XFEPub/ToZip/EPUB/style')
 
-        if (not os.path.exists('ToZip/META-INF')):
-            os.makedirs('ToZip/META-INF')
+        if (not os.path.exists('XFEPub/ToZip/META-INF')):
+            os.makedirs('XFEPub/ToZip/META-INF')
 
 
 if __name__ == "__main__":
