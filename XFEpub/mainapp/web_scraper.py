@@ -1,6 +1,6 @@
 import requests, bs4, time, os, datetime, zipfile, shutil, re
 from pathlib import Path
-from mainapp.error import BadRequestException
+#from mainapp.error import BadRequestException
 
 class web_scraper:
     chapter_num = 1
@@ -220,3 +220,10 @@ class web_scraper:
 
         if (not os.path.exists('ToZip/META-INF')):
             os.makedirs('ToZip/META-INF')
+
+
+if __name__ == "__main__":
+    url = "https://forums.spacebattles.com/threads/beware-of-chicken-xianxia.910799/"
+
+    obj = web_scraper()
+    obj.webscrape(url)
